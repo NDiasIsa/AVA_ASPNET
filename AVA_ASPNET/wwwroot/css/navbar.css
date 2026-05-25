@@ -1,0 +1,97 @@
+/*
+    A pseudo classe :root permite criar variáveis CSS com os valores de cores usados pela navbar. Para mudar as cores da navbar, modifique APENAS os valores das variáveis abaixo. Para mudar a cor do botão "hamburger" consulte o último estilo do arquivo. 
+*/
+
+:root {
+    --cor-fundo: #cfeeff;
+    --cor-texto: #005162;
+    --cor-hover: #67c3cf;
+    --cor-fundo-dropdown : #afc1d0;
+    --fonte-texto: 'Segoe UI';
+}
+
+/*
+    A tag footer contém o rodapé da página, e deve ter as mesmas cores de fundo e texto da navbar. Fazemos isso usando as variáveis CSS --cor-texto e --cor-fundo
+*/
+
+/*
+    Classes para mudar as cores da navbar no Bootstrap 5. 
+
+    A cor de fundo pode ser mudada por linear-gradient() ou background-color. A propriedade !important depois do estilo de cores (letra e fundo) quebra a hierarquia do CSS, forçando o uso da cor informada. Sem ela a cor informada nesse arquivo não funciona. Os outros estilos não necessitam da propriedade !important para funcionar.
+*/
+
+.cor-navbar {
+    /*
+        Classe usada para mudar cor de fundo da parte horizontal da navbar. Deve ser alpicada na tag <nav>. Atenção: deve ser a última classe.
+
+        background-image: linear-gradient(to right, darkgreen, mediumgreen);
+    */
+    background-color: var(--cor-fundo) !important;
+}
+.navbar-brand {
+    /*
+        Cor e negrito no texto da logomarca da navbar. Não é usado quando o texto é substituído por uma imagem
+    */
+    color:var(--cor-fundo-dropdown) !important;
+    font-weight: bold;
+}
+.nav-link { 
+    /*
+        Cor dos links horizontais da navbar (tags <a>) 
+    */
+    color:var(--cor-texto) !important; 
+    /*
+        O tamanho padrão da letra da navbar é 1em
+    */
+    font-size: 1.1em;
+    font-family: var(--fonte-texto) !important;
+}
+.nav-link:hover, .navbar-brand { 
+    /*
+        Cor dos links horizontais da navbar (tags <a>) durante o hover. Acrescido cor de hover para classe .navbar-brand, que é usada quando o link contém apenas texto.
+    */
+    color:var(--cor-hover) !important; 
+}
+.dropdown-menu {
+    /*
+        Cor de fundo e borda do menu dropdown. Se for usar background-color é preciso acrescentar a propriedade !important
+    
+        background-image: linear-gradient(to right, darkblue, mediumblue);
+    */
+    background-color: var(--cor-fundo) !important;
+    border: 2px solid var(--cor-fundo-dropdown);
+}
+.dropdown-item  {
+    /*
+        Cor dos links do menu dropdown (tags <a>) 
+    */
+    color: var(--cor-texto) !important;
+    /*
+        O tamanho padrão da letra do menu dropdown é 1em
+    */
+    font-size: 1.1em;
+    font-family: var(--fonte-texto) !important;
+}
+.dropdown-item:hover  {
+    /*
+        Cor dos links do menu dropdown durante o hover (tags <a> da janela dropdwon). Nesse caso, o estilo background-color não precisa da propriedade !important para funcionar.
+    */
+    color: var(--cor-fundo) !important;
+    background-color: var(--cor-fundo-dropdown);
+    font-weight: bold;
+}
+.cor-icone {
+    fill: var(--cor-texto);
+}
+
+.cor-icone:hover {
+    fill: var(--cor-hover);
+}
+
+/*
+    Muda a cor do hamburguer para amarelo e aumenta para 2px a espessura da borda. Muda a opacidade dos 3 riscos para 1. Atenção: não é possível usar variável CSS para mudar a cor da imagem SVG (tem que ser em hexadecimal). Para mudar a cor, modifique os valores hexadecimais localizados entre os caracteres rgba%28 e %29
+*/
+.navbar-toggler { border: 2px solid var(--cor-hover); }
+.navbar-toggler-icon{
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 0, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}

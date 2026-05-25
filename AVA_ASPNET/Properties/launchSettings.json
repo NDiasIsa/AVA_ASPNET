@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "AVA_ASPNET": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:59282;http://localhost:59283"
+    }
+  }
+}

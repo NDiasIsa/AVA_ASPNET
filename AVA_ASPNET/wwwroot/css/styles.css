@@ -1,0 +1,112 @@
+:root {
+    --cor-fundo-main: #f2f1ec;
+    --cor-titulo: #005162;
+    --fonte-texto: 'Segoe UI';
+    --cor-divisorv: #afc1d0;
+    --cor-assunto: #67c3cf;
+    --cor-texto-destaques: #f2f1ec;
+}
+/*gerais*/
+*{
+    box-sizing: border-box;
+}
+body{
+    background-color: #f2f1ec;
+}
+.titulo{
+    margin-top: 50px;
+    font-family: var(--fonte-texto) !important;
+    font-weight: bold;
+    color: var(--cor-texto);
+    text-align: center;
+}
+.divisor-h-topo{
+    background-color: var(--cor-titulo);
+    margin-top: 50px;
+    height: 1px;
+    display: block;
+    padding: 0;
+}
+.divisor-h-baixo{
+    background-color: var(--cor-titulo);
+    margin-bottom: 50px;
+    height: 1px;
+    display: block;
+    padding: 0;
+}
+.divisor-v{
+    float: right;
+    background-color: var(--cor-divisorv);
+    margin-top: 10px;
+    height: 95%;
+    width: 1px;
+    display: block;
+    padding: 0;
+}
+
+/* carousel*/
+#meuCarousel{
+    margin-top: 20px;
+}
+.carousel-item{
+    height: 250px;
+    position: relative;
+}
+.destaques-link{
+    text-decoration: none;
+    color: var(--cor-texto-destaques) !important;
+    width: 100%;
+}
+.assunto-destaques{
+    position: absolute;
+    top: 10%;
+    left: 15%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    font-size: 1em;
+}
+.manchete-destaques{
+    position: absolute;
+    top: 65%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    font-weight: bold;
+}
+.carousel-item:hover .img-destaques{
+    transform: scale(1.02);
+    transition: 1s;
+}
+
+/*notícias*/
+.noticia{
+    float: left;
+    width: 80%;
+    margin: 10px;
+    
+}
+.noticia img{
+    width: 100%;
+}
+.assunto{
+    color: var(--cor-assunto);
+}
+.noticia-link{
+    text-decoration: none;
+    color: var(--cor-titulo) !important;
+}
+
+/*rodapé*/
+footer {
+    color: var(--cor-texto);
+    background-color: var(--cor-fundo);
+    font-size: 1em;
+    font-family: var(--fonte-texto);
+    text-align: center;
+    margin: auto !important;
+}
+.texto-rodape{
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

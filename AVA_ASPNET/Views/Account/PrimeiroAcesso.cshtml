@@ -1,0 +1,60 @@
+@model PrimeiroAcessoViewModel
+@{ ViewData["Title"] = "Primeiro Acesso"; }
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-stars me-2"></i> Bem-vindo(a), @Model.NomeCompleto!
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">
+                        Este é seu primeiro acesso. Defina uma senha e selecione sua turma para continuar.
+                    </p>
+
+                    <form asp-action="PrimeiroAcesso" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Matricula" />
+
+                        <div asp-validation-summary="All" class="alert alert-danger"
+                             style="display:@(ViewData.ModelState.ErrorCount > 0 ? "block" : "none")"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Matrícula</label>
+                            <input class="form-control" value="@Model.Matricula" readonly disabled />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Senha" class="form-label fw-semibold"></label>
+                            <input asp-for="Senha" class="form-control" placeholder="Mínimo 6 caracteres" />
+                            <span asp-validation-for="Senha" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ConfirmarSenha" class="form-label fw-semibold"></label>
+                            <input asp-for="ConfirmarSenha" class="form-control" />
+                            <span asp-validation-for="ConfirmarSenha" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="TurmaId" class="form-label fw-semibold"></label>
+                            <select asp-for="TurmaId" class="form-select">
+                                <option value="">— Selecione sua turma —</option>
+                                @foreach (var turma in Model.TurmasDisponiveis)
+                                {
+                                    <option value="@turma.Id">@turma.NomeExibicao</option>
+                                }
+                            </select>
+                            <span asp-validation-for="TurmaId" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-circle me-1"></i> Confirmar e entrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
