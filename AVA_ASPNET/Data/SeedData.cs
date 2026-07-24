@@ -14,8 +14,8 @@ namespace AVA_ASPNET.Data
             var db = services.GetRequiredService<AppDbContext>();
             var streams = new Stream[]
             {
-                //bota os arquivos CSV que você quer ler aq
-                File.OpenRead("C:\\Users\\lyipe\\Documents\\csv\\305.csv"),
+                //bota os arquivos CSV que você quer ler aq (já ta na raiz do projeto aí)
+                File.OpenRead(/*bota o caminho aq*/),
             };
 
             await db.Database.EnsureCreatedAsync();
