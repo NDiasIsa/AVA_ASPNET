@@ -1,5 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using AVA_ASPNET.Models.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace AVA_ASPNET.Models
@@ -14,19 +13,9 @@ namespace AVA_ASPNET.Models
     public class Perfil
     {
         public int Id { get; set; }
-
-        [Required]
         public string UserId { get; set; } = string.Empty;
-
-        [Required, MaxLength(20)]
-        public string TipoUsuario { get; set; } = "Aluno";
-
-        [Required, MaxLength(150)]
-        [Display(Name = "Nome completo")]
+        public string TipoUsuario { get; set; } = UsuarioRole.Aluno;
         public string NomeCompleto { get; set; } = string.Empty;
-
-        [MaxLength(20)]
-        [Display(Name = "Matrícula")]
         public string? Matricula { get; set; }
 
         /// <summary>
@@ -41,10 +30,7 @@ namespace AVA_ASPNET.Models
         public string? FotoUrl { get; set; }
 
         // Navegação
-        [ForeignKey(nameof(UserId))]
         public virtual IdentityUser? Usuario { get; set; }
-
-        [ForeignKey(nameof(TurmaId))]
         public virtual Turma? Turma { get; set; }
 
         // Só para professores (podem lecionar em várias turmas)

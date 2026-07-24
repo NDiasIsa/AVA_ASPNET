@@ -17,28 +17,8 @@ namespace AVA_ASPNET.Data
         {
             base.OnModelCreating(builder);
 
-            // Um usuário tem apenas um perfil
-            builder.Entity<Perfil>()
-                .HasIndex(p => p.UserId)
-                .IsUnique();
-
-            // Matrícula única por perfil
-            builder.Entity<Perfil>()
-                .HasIndex(p => p.Matricula)
-                .IsUnique()
-                .HasFilter("[Matricula] IS NOT NULL");
-
-            // Aluno → Turma (FK simples, sem tabela de junção)
-            builder.Entity<Perfil>()
-                .HasOne(p => p.Turma)
-                .WithMany(t => t.Alunos)
-                .HasForeignKey(p => p.TurmaId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            // Professor não pode estar duas vezes na mesma turma
-            builder.Entity<ProfessorTurma>()
-                .HasIndex(p => new { p.PerfilId, p.TurmaId })
-                .IsUnique();
+            // Aplica todas as IEntityTypeConfiguration deste assembly (pasta Data/Mapping)
+            builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
     }
 }

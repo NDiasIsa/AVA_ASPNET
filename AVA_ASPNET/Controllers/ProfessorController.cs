@@ -1,5 +1,6 @@
 using AVA_ASPNET.Data;
 using AVA_ASPNET.Models;
+using AVA_ASPNET.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AVA_ASPNET.Controllers
 {
-    [Authorize(Roles = "Professor,Admin")]
+    [Authorize(Roles = UsuarioRole.AdminEProfessor)]
     public class ProfessorController : Controller
     {
         private readonly AppDbContext _db;

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AVA_ASPNET.Models
 {
@@ -10,11 +9,9 @@ namespace AVA_ASPNET.Models
     {
         public int Id { get; set; }
 
-        [Required, MaxLength(10)]
         [Display(Name = "Código")]
         public string Codigo { get; set; } = string.Empty;
 
-        [MaxLength(100)]
         [Display(Name = "Descrição")]
         public string? Descricao { get; set; }
 
@@ -28,7 +25,6 @@ namespace AVA_ASPNET.Models
         // Professor dono da turma
         public int ProfessorId { get; set; }
 
-        [ForeignKey(nameof(ProfessorId))]
         public virtual Perfil? Professor { get; set; }
 
         // Navegação
@@ -45,10 +41,7 @@ namespace AVA_ASPNET.Models
         public int PerfilId { get; set; }
         public int TurmaId { get; set; }
 
-        [ForeignKey(nameof(PerfilId))]
         public virtual Perfil? Perfil { get; set; }
-
-        [ForeignKey(nameof(TurmaId))]
         public virtual Turma? Turma { get; set; }
     }
 }
