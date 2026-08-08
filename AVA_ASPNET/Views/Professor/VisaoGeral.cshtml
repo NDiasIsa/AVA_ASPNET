@@ -1,0 +1,70 @@
+﻿@model AVA_ASPNET.Models.VisaoGeralViewModel
+@{
+    ViewData["Title"] = "Visão Geral";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="titulo mb-0">Visão Geral das Turmas</h2>
+        <a asp-action="MinhasTurmas" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    @if (!Model.Turmas.Any())
+    {
+        <div class="alert alert-info">Nenhuma turma associada.</div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var t in Model.Turmas)
+            {
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header fw-semibold">
+                            <i class="bi bi-door-open me-1"></i> @t.NomeTurma
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Alunos</span>
+                                <span class="badge bg-secondary">@t.TotalAlunos</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Atividades abertas</span>
+                                <span class="badge bg-primary">@t.AtividadesPendentes</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Entregas p/ corrigir</span>
+                                @if (t.EntregasPendenteCorrecao > 0)
+                                {
+                                    <span class="badge bg-warning text-dark">@t.EntregasPendenteCorrecao</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">0</span>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted small">Quizzes ativos</span>
+                                <span class="badge bg-warning text-dark">@t.QuizzesAtivos</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent d-flex gap-2">
+                            <a asp-controller="Turma" asp-action="Index"
+                               asp-route-turmaId="@t.TurmaId"
+                               class="btn btn-sm btn-outline-primary flex-fill">
+                                <i class="bi bi-door-open me-1"></i> Abrir
+                            </a>
+                            <a asp-controller="Turma" asp-action="Painel"
+                               asp-route-turmaId="@t.TurmaId"
+                               class="btn btn-sm btn-outline-secondary flex-fill">
+                                <i class="bi bi-bar-chart me-1"></i> Painel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

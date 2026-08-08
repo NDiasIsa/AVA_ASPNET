@@ -8,38 +8,55 @@
     <div class="row">
         <div class="col-md-12">
             <h2 class="titulo">DESTAQUES</h2>
-            <div id="meuCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                    @for (int i = 0; i < Model.Destaques.Count; i++)
-                    {
-                        <button type="button"
-                                data-bs-target="#meuCarousel"
-                                data-bs-slide-to="@i"
-                                class="@(i == 0 ? "active" : "")"></button>
-                    }
-                </div>
 
-                <div class="carousel-inner">
-                    @for (int i = 0; i < Model.Destaques.Count; i++)
-                    {
-                        var destaque = Model.Destaques[i];
-                        <div class="carousel-item @(i == 0 ? "active" : "")" data-bs-interval="10000">
-                            <a class="destaques-link" href="@destaque.Link">
-                                <img class="img-destaques" src="@destaque.ImagemUrl" class="d-block w-100" alt="@destaque.Titulo">
-                                <label class="assunto-destaques">@destaque.Assunto</label>
-                                <label class="manchete-destaques fs-2 fs-md-1">@destaque.Titulo</label>
-                            </a>
-                        </div>
-                    }
-                </div>
+            @if (Model.Destaques.Any())
+            {
+                <div id="meuCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        @for (int i = 0; i < Model.Destaques.Count; i++)
+                        {
+                            <button type="button"
+                                    data-bs-target="#meuCarousel"
+                                    data-bs-slide-to="@i"
+                                    class="@(i == 0 ? "active" : "")"></button>
+                        }
+                    </div>
 
-                <button class="carousel-control-prev" type="button" data-bs-target="#meuCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#meuCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
-            </div>
+
+
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < Model.Destaques.Count; i++)
+                        {
+                            var destaque = Model.Destaques[i];
+                            <div class="carousel-item @(i == 0 ? "active" : "")" data-bs-interval="10000">
+                                <a asp-controller="Home" asp-action="Noticia" asp-route-id="@destaque.Id"
+                                   style="color:inherit; text-decoration:none;">
+                                    <img class="img-destaques d-block w-100"
+                                         src="@(destaque.ImagemUrl ?? "/imagens/bannerAV3.png")"
+                                         alt="@destaque.Titulo">
+                                    <label class="manchete-destaques fs-2 fs-md-1"
+                                           style="color: @destaque.CorTitulo;">@destaque.Titulo</label>
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    <button class="carousel-control-prev" type="button"
+                            data-bs-target="#meuCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button"
+                            data-bs-target="#meuCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    Nenhum destaque publicado ainda.
+                </div>
+            }
         </div>
     </div>
 
@@ -50,25 +67,41 @@
         </div>
     </div>
 
-    <!-- Seção Notícias -->
+    <!-- Seção Cards -->
     <div class="row">
-        @foreach (var noticia in Model.Noticias)
+        @if (Model.Cards.Any())
         {
-            <div class="col-md-4">
-                <div class="noticia">
-                    <a class="noticia-link" href="@noticia.Link">
-                        <img src="@noticia.ImagemUrl" alt="@noticia.Titulo">
-                    </a>
-                    <h5 class="assunto">@noticia.Assunto</h5>
-                    <a class="noticia-link" href="@noticia.Link">
-                        <h3>@noticia.Titulo</h3>
-                        <p>@noticia.Descricao</p>
-                    </a>
+            @foreach (var noticia in Model.Cards)
+            {
+                <div class="col-md-4">
+                    <div class="noticia">
+                        <a asp-controller="Home" asp-action="Noticia" asp-route-id="@noticia.Id"
+                           style="text-decoration:none; color:inherit;">
+                            @if (!string.IsNullOrEmpty(noticia.ImagemCardUrl))
+                            {
+                                <img src="@noticia.ImagemCardUrl" alt="@noticia.Titulo">
+                            }
+                            <h3>@noticia.Titulo</h3>
+                            @if (!string.IsNullOrEmpty(noticia.Resumo))
+                            {
+                                <p>@noticia.Resumo</p>
+                            }
+                            <small class="text-muted">
+                                @noticia.DataPublicacao.ToString("dd/MM/yyyy")
+                            </small>
+                        </a>
+                    </div>
+                    @if (noticia != Model.Cards.Last())
+                    {
+                        <span class="divisor-v"></span>
+                    }
                 </div>
-                @if (noticia != Model.Noticias.Last())
-                {
-                    <span class="divisor-v"></span>
-                }
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <p class="text-muted text-center py-4">Nenhum card publicado ainda.</p>
             </div>
         }
 

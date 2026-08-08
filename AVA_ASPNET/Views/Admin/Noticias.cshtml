@@ -1,0 +1,89 @@
+﻿@model List<AVA_ASPNET.Models.Noticia>
+@{
+    ViewData["Title"] = "Notícias";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="titulo mb-0">Notícias</h2>
+        <a asp-action="CriarNoticia" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Nova Notícia
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-1"></i> Nenhuma notícia cadastrada ainda.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Título</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Destaque</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var n in Model)
+                    {
+                        <tr>
+                            <td>@n.Titulo</td>
+                            <td class="text-muted small">
+                                @n.DataPublicacao.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>
+                                @if (n.Publicada)
+                                {
+                                    <span class="badge bg-success">Publicada</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Rascunho</span>
+                                }
+                            </td>
+                            <td>
+                                @if (n.Destaque)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-star-fill me-1"></i>Destaque
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a asp-action="EditarNoticia" asp-route-id="@n.Id"
+                                       class="btn btn-sm btn-outline-secondary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="ExcluirNoticia" method="post" class="d-inline"
+                                          onsubmit="return confirm('Excluir a notícia @n.Titulo?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@n.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <a asp-action="Index" class="btn btn-link mt-2">
+        <i class="bi bi-arrow-left"></i> Voltar ao painel
+    </a>
+</div>

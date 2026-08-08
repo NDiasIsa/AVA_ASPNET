@@ -1,0 +1,89 @@
+﻿@model AVA_ASPNET.Models.ResponderAtividadeAvalViewModel
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="titulo mb-1">@Model.Titulo</h2>
+            @if (Model.Prazo.HasValue)
+            {
+                <p class="text-muted mb-1">
+                    <span class="badge @(Model.Prazo < DateTime.Now ? "bg-danger" : "bg-secondary")">
+                        Prazo: @Model.Prazo.Value.ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                    <span class="badge bg-primary ms-1">Valor: @Model.ValorMaximo pts</span>
+                </p>
+            }
+            @if (!string.IsNullOrEmpty(Model.Descricao))
+            {
+                <div class="card shadow-sm mb-4 mt-3">
+                    <div class="card-body">
+                        <p class="mb-0">@Model.Descricao</p>
+                    </div>
+                </div>
+            }
+
+            <div class="alert alert-warning mb-4">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                <strong>Atenção:</strong> Você tem apenas <strong>uma tentativa</strong>. Revise suas respostas antes de enviar.
+            </div>
+
+            <form asp-action="ResponderAtividadeAval" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="AtividadeId" />
+                <input type="hidden" asp-for="TurmaId" />
+                <input type="hidden" asp-for="Titulo" />
+                <input type="hidden" asp-for="ValorMaximo" />
+
+                @for (int i = 0; i < Model.Questoes.Count; i++)
+                {
+                    var questao = Model.Questoes[i];
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header fw-semibold">Questão @(i + 1)</div>
+                        <div class="card-body">
+                            <p class="mb-3 fw-semibold">@questao.Enunciado</p>
+                            @if (!string.IsNullOrEmpty(questao.ImagemUrl))
+                            {
+                                <img src="@questao.ImagemUrl" class="img-fluid rounded mb-3"
+                                     style="max-height:300px;" />
+                            }
+                            <input type="hidden" name="Questoes[@i].QuestaoId" value="@questao.QuestaoId" />
+                            <input type="hidden" name="Questoes[@i].Enunciado" value="@questao.Enunciado" />
+                            <input type="hidden" name="Questoes[@i].ImagemUrl" value="@questao.ImagemUrl" />
+
+                            @for (int j = 0; j < questao.Alternativas.Count; j++)
+                            {
+                                var alt = questao.Alternativas[j];
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio"
+                                           name="Questoes[@i].AlternativaSelecionada"
+                                           value="@alt.AlternativaId"
+                                           id="alt_@(questao.QuestaoId)_@j" />
+                                    <label class="form-check-label" for="alt_@(questao.QuestaoId)_@j">
+                                        @alt.Texto
+                                    </label>
+                                    <input type="hidden" name="Questoes[@i].Alternativas[@j].AlternativaId"
+                                           value="@alt.AlternativaId" />
+                                    <input type="hidden" name="Questoes[@i].Alternativas[@j].Texto"
+                                           value="@alt.Texto" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-warning"
+                            onclick="return confirm('Tem certeza? Você só pode responder uma vez!')">
+                        <i class="bi bi-check-circle me-1"></i> Enviar respostas
+                    </button>
+                    <a asp-controller="Turma" asp-action="Index"
+                       asp-route-turmaId="@Model.TurmaId"
+                       class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

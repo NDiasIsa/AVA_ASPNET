@@ -1,31 +1,44 @@
+using AVA_ASPNET.Data;
 using AVA_ASPNET.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AVA_ASPNET.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly AppDbContext _db;
+
+        public HomeController(AppDbContext db)
         {
+            _db = db;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var noticias = await _db.Noticias
+                .Where(n => n.Publicada)
+                .OrderByDescending(n => n.DataPublicacao)
+                .ToListAsync();
+
             var viewModel = new HomeViewModel
             {
-                Destaques = new List<Noticia>
-                {
-                    new() { Id = 1, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit amet.", ImagemUrl = "/imagens/img-exemplo.png", Link = "#" },
-                    new() { Id = 2, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit amet consectetur adipisicing elit.", ImagemUrl = "/imagens/img-exemplo2.png", Link = "#" },
-                    new() { Id = 3, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse.", ImagemUrl = "/imagens/img-exemplo3.png", Link = "#" },
-                    new() { Id = 4, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit amet consectetur.", ImagemUrl = "/imagens/img-exemplo4.png", Link = "#" },
-                    new() { Id = 5, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, magni.", ImagemUrl = "/imagens/img-exemplo5.png", Link = "#" },
-                },
-                Noticias = new List<Noticia>
-                {
-                    new() { Id = 1, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit amet.", Descricao = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta vero minima aperiam, repellat sed, provident nisi ipsam quaerat, enim neque excepturi.", ImagemUrl = "/imagens/img-exemplo.png", Link = "#" },
-                    new() { Id = 2, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit amet consectetur adipisicing.", Descricao = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Modi est ipsum repellendus quidem ducimus. Impedit nulla quia doloremque.", ImagemUrl = "/imagens/img-exemplo2.png", Link = "#" },
-                    new() { Id = 3, Assunto = "assunto", Titulo = "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, neque!", Descricao = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam dolorem nobis atque? Voluptatem, repellendus repellat!", ImagemUrl = "/imagens/img-exemplo5.png", Link = "#" },
-                }
+                Destaques = noticias.Where(n => n.Destaque).ToList(),
+                Cards = noticias.Where(n => n.Card).ToList()
             };
 
             return View(viewModel);
+        }
+
+        public async Task<IActionResult> Noticia(int id)
+        {
+            var noticia = await _db.Noticias
+                .Include(n => n.Autor)
+                .FirstOrDefaultAsync(n => n.Id == id && n.Publicada);
+
+            if (noticia == null) return NotFound();
+
+            return View(noticia);
         }
 
         public IActionResult Error() => View();

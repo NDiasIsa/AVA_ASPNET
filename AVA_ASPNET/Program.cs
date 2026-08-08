@@ -10,13 +10,25 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
     options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+
+// Serviço de e-mail
+builder.Services.AddSingleton<AVA_ASPNET.Services.EmailService>();
+
+// Sessão
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -37,14 +49,61 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true &&
+        context.User.IsInRole("Aluno"))
+    {
+        var path = context.Request.Path.Value?.ToLower() ?? "";
+
+        var liberadas = new[] {
+            "/account/primeiroacesso",
+            "/account/logout",
+            "/account/login",
+            "/account/esquecisenha",
+            "/account/redefinirsenha"
+        };
+
+        bool ehLiberada = liberadas.Any(l => path.StartsWith(l)) ||
+                          path.StartsWith("/uploads") ||
+                          path.StartsWith("/imagens") ||
+                          path.StartsWith("/css") ||
+                          path.StartsWith("/js") ||
+                          path.StartsWith("/lib");
+
+        if (!ehLiberada)
+        {
+            var jaChecou = context.Session.GetString("primeiroAcessoChecado");
+            if (jaChecou == null)
+            {
+                // Usa o claim do usuário em vez de ir ao banco pelo UserManager
+                var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (userId != null)
+                {
+                    var db = context.RequestServices.GetRequiredService<AVA_ASPNET.Data.AppDbContext>();
+                    var perfil = await db.Perfis.FirstOrDefaultAsync(p => p.UserId == userId);
+                    if (perfil != null && perfil.PrimeiroAcesso)
+                    {
+                        context.Response.Redirect("/Account/PrimeiroAcesso");
+                        return;
+                    }
+                }
+                context.Session.SetString("primeiroAcessoChecado", "true");
+            }
+        }
+    }
+
+    await next();
+});
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 using (var scope = app.Services.CreateScope())
 {

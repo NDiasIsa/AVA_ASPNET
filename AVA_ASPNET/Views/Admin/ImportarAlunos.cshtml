@@ -9,7 +9,7 @@
 
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                    <form asp-action="ImportarAlunos" method="post">
+                    <form asp-action="ImportarAlunos" method="post" enctype="multipart/form-data">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="TurmaId" />
                         <input type="hidden" asp-for="NomeTurma" />
@@ -17,24 +17,21 @@
                         <div asp-validation-summary="All" class="alert alert-danger"
                              style="display:@(ViewData.ModelState.ErrorCount > 0 ? "block" : "none")"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="ListaCSV" class="form-label fw-semibold"></label>
-                            <textarea asp-for="ListaCSV" class="form-control font-monospace" rows="10"
-                                      placeholder="João Silva;20240001
-Maria Souza;20240002
-Pedro Lima;20240003"></textarea>
-                            <div class="form-text">
-                                Formato: <code>Nome Completo;Matrícula</code> — uma por linha.<br>
-                                O aluno usará a matrícula para fazer o primeiro login.
+                        <div class="mb-4">
+                            <label asp-for="ArquivoCSV" class="form-label fw-semibold"></label>
+                            <input asp-for="ArquivoCSV" type="file" class="form-control" accept=".csv" />
+                            <div class="form-text mt-2">
+                                Arquivo <code>.csv</code> com separador <code>;</code>
+                                e colunas <code>Matrícula</code> e <code>Aluno</code>.
                             </div>
-                            <span asp-validation-for="ListaCSV" class="text-danger small"></span>
+                            <span asp-validation-for="ArquivoCSV" class="text-danger small"></span>
                         </div>
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-upload me-1"></i> Importar alunos
+                                <i class="bi bi-upload me-1"></i> Importar
                             </button>
-                            <a asp-action="MinhasTurmas" class="btn btn-outline-secondary">Cancelar</a>
+                            <a asp-controller="Admin" asp-action="Turmas" class="btn btn-outline-secondary">Cancelar</a>
                         </div>
                     </form>
                 </div>
@@ -43,7 +40,7 @@ Pedro Lima;20240003"></textarea>
             <div class="alert alert-info mt-3">
                 <i class="bi bi-info-circle me-1"></i>
                 <strong>Como funciona o primeiro acesso:</strong> O aluno entra com a matrícula e a senha
-                temporária <code>matrícula@Qp1</code>. Na primeira vez ele define sua própria senha e
+                temporária <code>[Aluno@123]</code>. Na primeira vez ele define sua própria senha e
                 confirma a turma.
             </div>
         </div>

@@ -1,0 +1,75 @@
+﻿@model AVA_ASPNET.Models.Quiz
+@{
+    ViewData["Title"] = "Resultados — " + Model.Titulo;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h2 class="titulo mb-1">@Model.Titulo</h2>
+            <p class="text-muted">@Model.Questoes.Count questão(ões)</p>
+        </div>
+        <a asp-controller="Turma" asp-action="Index"
+           asp-route-turmaId="@ViewBag.TurmaId"
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    @if (!Model.Resultados.Any())
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-1"></i> Nenhum aluno realizou este quiz ainda.
+        </div>
+    }
+    else
+    {
+        @* Agrupa por aluno e pega a melhor nota *@
+        var porAluno = Model.Resultados
+            .GroupBy(r => r.AlunoId)
+            .Select(g => new
+            {
+                Aluno = g.First().Aluno,
+                Tentativas = g.Count(),
+                MelhorNota = g.Max(r => r.Pontuacao),
+                UltimaData = g.Max(r => r.DataRealizacao)
+            })
+            .OrderByDescending(a => a.MelhorNota)
+            .ToList();
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Aluno</th>
+                        <th>Tentativas</th>
+                        <th>Melhor nota</th>
+                        <th>Última tentativa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int pos = 1;
+                    }
+                    @foreach (var item in porAluno)
+                    {
+                        <tr>
+                            <td class="text-muted">@(pos++)</td>
+                            <td>@item.Aluno?.NomeCompleto</td>
+                            <td><span class="badge bg-secondary">@item.Tentativas</span></td>
+                            <td>
+                                <span class="badge @(item.MelhorNota >= 60 ? "bg-success" : "bg-danger")">
+                                    @item.MelhorNota%
+                                </span>
+                            </td>
+                            <td class="text-muted small">
+                                @item.UltimaData.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

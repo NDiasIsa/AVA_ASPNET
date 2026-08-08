@@ -1,0 +1,69 @@
+﻿@model AVA_ASPNET.Models.ResultadoAtividadeAvalViewModel
+@{
+    ViewData["Title"] = "Resultado — " + Model.Titulo;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4 text-center">
+                <div class="card-body py-4">
+                    <h2 class="titulo mb-1">@Model.Titulo</h2>
+                    <p class="text-muted mb-3">Resultado</p>
+
+                    <div class="display-4 fw-bold @(Model.Nota >= Model.ValorMaximo * 0.6m ? "text-success" : "text-danger")">
+                        @Model.Nota / @Model.ValorMaximo
+                    </div>
+                    <p class="text-muted mt-2">
+                        @Model.TotalAcertos de @Model.TotalQuestoes questões corretas
+                    </p>
+
+                    @if (Model.Nota >= Model.ValorMaximo * 0.6m)
+                    {
+                        <div class="alert alert-success mt-3">
+                            <i class="bi bi-trophy-fill me-2"></i> Parabéns! Você foi bem!
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-book me-2"></i> Continue estudando! Converse com o professor.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <h5 class="mb-3">Gabarito</h5>
+            @for (int idx = 0; idx < Model.Questoes.Count; idx++)
+            {
+                var q = Model.Questoes[idx];
+                <div class="card mb-2 border-@(q.Acertou ? "success" : "danger")">
+                    <div class="card-body">
+                        <p class="fw-semibold mb-2">@q.Enunciado</p>
+                        <p class="mb-1">
+                            <span class="badge @(q.Acertou ? "bg-success" : "bg-danger") me-1">
+                                Sua resposta
+                            </span>
+                            @q.AlternativaEscolhida
+                        </p>
+                        @if (!q.Acertou)
+                        {
+                            <p class="mb-0 text-success">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Correta: @q.AlternativaCorreta
+                            </p>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="mt-4">
+                <a asp-controller="Turma" asp-action="Index"
+                   asp-route-turmaId="@Model.TurmaId"
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar à turma
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+﻿@model AVA_ASPNET.Models.CorrigirEntregaViewModel
+@{
+    ViewData["Title"] = "Corrigir Entrega";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <h2 class="titulo mb-1">Corrigir Entrega</h2>
+            <p class="text-muted mb-4">
+                <strong>@Model.NomeAluno</strong> — @Model.TituloAtividade
+            </p>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">Entrega do aluno</div>
+                <div class="card-body">
+                    <p class="text-muted small mb-2">
+                        Enviado em: @Model.DataEntrega.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+                    @if (!string.IsNullOrEmpty(Model.ArquivoUrl))
+                    {
+                        <a asp-controller="Arquivo" asp-action="Entrega"
+                           asp-route-entregaId="@Model.EntregaId"
+                           target="_blank" class="btn btn-sm btn-outline-primary mb-2">
+                            <i class="bi bi-paperclip me-1"></i> @Model.NomeArquivo
+                        </a>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.TextoResposta))
+                    {
+                        <div class="border rounded p-3 bg-light">
+                            <p class="mb-0">@Model.TextoResposta</p>
+                        </div>
+                    }
+                    @if (string.IsNullOrEmpty(Model.ArquivoUrl) && string.IsNullOrEmpty(Model.TextoResposta))
+                    {
+                        <p class="text-muted">Nenhum conteúdo enviado.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">Correção</div>
+                <div class="card-body p-4">
+                    <form asp-action="CorrigirEntrega" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="EntregaId" />
+                        <input type="hidden" asp-for="TurmaId" />
+
+                        <div class="mb-3">
+                            <label asp-for="Nota" class="form-label fw-semibold"></label>
+                            <div class="input-group" style="max-width:200px;">
+                                <input asp-for="Nota" type="number" class="form-control"
+                                       min="0" max="@Model.ValorMaximo" step="0.1" />
+                                <span class="input-group-text">/ @Model.ValorMaximo</span>
+                            </div>
+                            <span asp-validation-for="Nota" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Feedback" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Feedback" class="form-control" rows="3"
+                                      placeholder="Comentários para o aluno..."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i> Salvar correção
+                            </button>
+                            <a asp-action="VerAtividade"
+                               asp-route-atividadeId="@Model.EntregaId"
+                               asp-route-turmaId="@Model.TurmaId"
+                               class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

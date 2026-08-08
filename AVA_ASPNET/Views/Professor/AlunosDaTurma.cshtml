@@ -9,7 +9,7 @@
     {
         <div class="alert alert-info">
             <i class="bi bi-info-circle me-1"></i> Nenhum aluno nesta turma ainda.
-            <a asp-action="ImportarAlunos" asp-route-turmaId="@Model.Id" class="alert-link ms-1">Importar alunos</a>
+            <a asp-area="Admin" asp-controller="Admin" asp-action="ImportarAlunos" asp-route-turmaId="@Model.Id" class="alert-link ms-1">Importar alunos</a>
         </div>
     }
     else
@@ -54,9 +54,6 @@
     }
 
     <div class="d-flex gap-2 mt-2">
-        <a asp-action="ImportarAlunos" asp-route-turmaId="@Model.Id" class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-upload me-1"></i> Importar mais alunos
-        </a>
         <a asp-action="MinhasTurmas" class="btn btn-link btn-sm">
             <i class="bi bi-arrow-left"></i> Voltar às turmas
         </a>

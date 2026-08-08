@@ -1,0 +1,751 @@
+﻿@model AVA_ASPNET.Models.TurmaPageViewModel
+@{
+    ViewData["Title"] = Model.Turma.NomeExibicao;
+}
+
+<div class="container mt-4">
+
+    @* Cabeçalho *@
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h2 class="titulo mb-1">@Model.Turma.Codigo</h2>
+            <p class="text-muted mb-0">
+                @Model.Turma.Ano º EM — @Model.Turma.AnoLetivo
+                &nbsp;·&nbsp; Prof. @(Model.Turma.Professor?.NomeCompleto ?? "—")
+            </p>
+        </div>
+        <a asp-controller="@(Model.EhProfessor ? "Professor" : "Aluno")"
+           asp-action="@(Model.EhProfessor ? "MinhasTurmas" : "MinhaTurma")"
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    @* Abas *@
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#mural">
+                <i class="bi bi-megaphone me-1"></i> Mural
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#conteudo">
+                <i class="bi bi-folder me-1"></i> Conteúdo
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#pessoas">
+                <i class="bi bi-people me-1"></i> Pessoas
+                <span class="badge bg-secondary ms-1">@Model.Turma.Alunos.Count(a => a.Ativo)</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#quiz">
+                <i class="bi bi-lightning me-1"></i> Quiz
+                <span class="badge bg-warning text-dark ms-1">@Model.Quizzes.Count</span>
+            </a>
+        </li>
+        @if (Model.EhProfessor)
+        {
+            <li class="nav-item">
+                <a asp-controller="Turma" asp-action="Painel"
+                   asp-route-turmaId="@Model.Turma.Id"
+                   class="nav-link">
+                    <i class="bi bi-bar-chart me-1"></i> Painel
+                </a>
+            </li>
+        }
+    </ul>
+
+    <div class="tab-content">
+
+        @* Aba Mural *@
+        <div class="tab-pane fade show active" id="mural">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <i class="bi bi-megaphone me-2"></i>Mural de Avisos
+                </div>
+                <div class="card-body">
+                    @if (Model.EhProfessor)
+                    {
+                        <form asp-controller="Turma" asp-action="PostarAviso" method="post" class="mb-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                            <div class="d-flex gap-2">
+                                <input type="text" name="texto" class="form-control"
+                                       placeholder="Escreva um aviso para a turma..." />
+                                <button type="submit" class="btn btn-primary text-nowrap">
+                                    <i class="bi bi-send me-1"></i> Postar
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    @if (Model.Avisos.Any())
+                    {
+                        @foreach (var aviso in Model.Avisos)
+                        {
+                            <div class="d-flex justify-content-between align-items-start border-bottom py-2">
+                                <div>
+                                    <p class="mb-0">@aviso.Texto</p>
+                                    <small class="text-muted">
+                                        @aviso.Autor?.NomeCompleto —
+                                        @aviso.DataPublicacao.ToString("dd/MM/yyyy HH:mm")
+                                    </small>
+                                </div>
+                                @if (Model.EhProfessor)
+                                {
+                                    <form asp-controller="Turma" asp-action="ExcluirAviso" method="post"
+                                          class="ms-2" onsubmit="return confirm('Excluir aviso?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="avisoId" value="@aviso.Id" />
+                                        <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Nenhum aviso ainda.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Aba Conteúdo *@
+        <div class="tab-pane fade" id="conteudo">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Seções</h5>
+                @if (Model.EhProfessor)
+                {
+                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
+                            data-bs-target="#formNovaSecao">
+                        <i class="bi bi-plus-circle me-1"></i> Nova Seção
+                    </button>
+                }
+            </div>
+
+            @if (Model.EhProfessor)
+            {
+                <div class="collapse mb-3" id="formNovaSecao">
+                    <div class="card card-body">
+                        <form asp-controller="Turma" asp-action="CriarSecao" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="TurmaId" value="@Model.Turma.Id" />
+                            <div class="d-flex gap-2 mb-2">
+                                <input type="text" name="Nome" class="form-control"
+                                       placeholder="Nome da nova seção" required />
+                                <button type="submit" class="btn btn-primary text-nowrap">Criar</button>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="Tipo"
+                                           value="Completa" id="tipoCompleta" checked />
+                                    <label class="form-check-label" for="tipoCompleta">
+                                        <i class="bi bi-paperclip me-1"></i> Material + Atividade
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="Tipo"
+                                           value="SoAtividade" id="tipoSoAtividade" />
+                                    <label class="form-check-label" for="tipoSoAtividade">
+                                        <i class="bi bi-journal-check me-1"></i> Só Atividade
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            @foreach (var secao in Model.Secoes)
+            {
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-folder me-2"></i>@secao.Nome</span>
+                        @if (Model.EhProfessor)
+                        {
+                            <form asp-controller="Turma" asp-action="ExcluirSecao" method="post"
+                                  class="d-inline" onsubmit="return confirm('Excluir seção @secao.Nome?')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="secaoId" value="@secao.Id" />
+                                <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
+
+                    <div class="card-body p-0">
+                        @if (secao.Tipo == "Completa")
+                        {
+                            <ul class="nav nav-tabs px-3 pt-2">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#material-@secao.Id">
+                                        <i class="bi bi-paperclip me-1"></i> Material
+                                        <span class="badge bg-secondary ms-1">@secao.Publicacoes.Count</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#atividade-@secao.Id">
+                                        <i class="bi bi-journal-check me-1"></i> Atividades
+                                        <span class="badge bg-warning text-dark ms-1">@secao.Atividades.Count</span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="material-@secao.Id">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var pub in secao.Publicacoes)
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    @if (pub.Tipo == "Arquivo")
+                                                    {
+                                                        <i class="bi bi-paperclip me-2 text-primary"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-link-45deg me-2 text-success"></i>
+                                                    }
+                                                    @if (pub.Tipo == "Arquivo" && !string.IsNullOrEmpty(pub.Url))
+                                                    {
+                                                        <a asp-controller="Arquivo" asp-action="Material"
+                                                           asp-route-publicacaoId="@pub.Id"
+                                                           target="_blank" class="fw-semibold">@pub.Titulo</a>
+                                                    }
+                                                    else if (pub.Tipo == "Link" && !string.IsNullOrEmpty(pub.Url))
+                                                    {
+                                                        <a href="@pub.Url" target="_blank" class="fw-semibold">@pub.Titulo</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="fw-semibold">@pub.Titulo</span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(pub.Descricao))
+                                                    {
+                                                        <p class="text-muted small mb-0 mt-1">@pub.Descricao</p>
+                                                    }
+                                                    <small class="text-muted d-block mt-1">
+                                                        @pub.Autor?.NomeCompleto — @pub.DataPublicacao.ToString("dd/MM/yyyy HH:mm")
+                                                    </small>
+                                                </div>
+                                                @if (Model.EhProfessor)
+                                                {
+                                                    <div class="d-flex gap-1 ms-2">
+                                                        <a asp-controller="Turma" asp-action="EditarPublicacao"
+                                                           asp-route-id="@pub.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                           class="btn btn-sm btn-outline-secondary">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-outline-warning"
+                                                                data-bs-toggle="modal" data-bs-target="#copiarPub-@pub.Id">
+                                                            <i class="bi bi-copy"></i>
+                                                        </button>
+                                                        <form asp-controller="Turma" asp-action="ExcluirPublicacao"
+                                                              method="post" class="d-inline"
+                                                              onsubmit="return confirm('Excluir este material?')">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="id" value="@pub.Id" />
+                                                            <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                }
+                                            </li>
+                                        }
+                                        @if (!secao.Publicacoes.Any())
+                                        {
+                                            <li class="list-group-item text-muted small">
+                                                <i class="bi bi-inbox me-1"></i> Nenhum material ainda.
+                                            </li>
+                                        }
+                                    </ul>
+                                    @if (Model.EhProfessor)
+                                    {
+                                        <div class="p-2 border-top">
+                                            <a asp-controller="Turma" asp-action="CriarPublicacao"
+                                               asp-route-secaoId="@secao.Id" asp-route-turmaId="@Model.Turma.Id"
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-plus-circle me-1"></i> Adicionar material
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="tab-pane fade" id="atividade-@secao.Id">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var ativ in secao.Atividades)
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <i class="bi bi-journal-check me-2 text-warning"></i>
+                                                    <span class="fw-semibold">@ativ.Titulo</span>
+                                                    @if (ativ.Tipo == "Avaliativa")
+                                                    {
+                                                        <span class="badge bg-info text-dark ms-1">Avaliativa</span>
+                                                    }
+                                                    @if (ativ.Prazo.HasValue)
+                                                    {
+                                                        <span class="badge @(ativ.Prazo < DateTime.Now ? "bg-danger" : "bg-secondary") ms-2">
+                                                            Prazo: @ativ.Prazo.Value.ToString("dd/MM/yyyy HH:mm")
+                                                        </span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(ativ.Descricao))
+                                                    {
+                                                        <p class="text-muted small mb-0 mt-1">@ativ.Descricao</p>
+                                                    }
+                                                    <small class="text-muted d-block mt-1">
+                                                        @ativ.Autor?.NomeCompleto — @ativ.DataPublicacao.ToString("dd/MM/yyyy HH:mm")
+                                                        · Valor: @ativ.ValorMaximo pts
+                                                    </small>
+                                                </div>
+                                                <div class="d-flex gap-1 ms-2">
+                                                    @if (Model.EhProfessor)
+                                                    {
+                                                        <a asp-controller="Turma" asp-action="VerAtividade"
+                                                           asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                           class="btn btn-sm btn-outline-secondary">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-outline-warning"
+                                                                data-bs-toggle="modal" data-bs-target="#copiarAtiv-@ativ.Id">
+                                                            <i class="bi bi-copy"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        @if (Model.AtividadesCorrigidas.Contains(ativ.Id))
+                                                        {
+                                                            <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                               asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                               class="btn btn-sm btn-success">
+                                                                <i class="bi bi-check-circle-fill me-1"></i> Corrigida
+                                                            </a>
+                                                        }
+                                                        else if (Model.AtividadesEntregues.Contains(ativ.Id))
+                                                        {
+                                                            <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                               asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                               class="btn btn-sm btn-info text-white">
+                                                                <i class="bi bi-clock me-1"></i> Entregue
+                                                            </a>
+                                                        }
+                                                        else if (ativ.Tipo == "Avaliativa")
+                                                        {
+                                                            <a asp-controller="Turma" asp-action="ResponderAtividadeAval"
+                                                               asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                               class="btn btn-sm btn-warning">
+                                                                <i class="bi bi-pencil-square me-1"></i> Responder
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                               asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                               class="btn btn-sm btn-outline-warning">
+                                                                <i class="bi bi-upload me-1"></i> Entregar
+                                                            </a>
+                                                        }
+                                                    }
+                                                </div>
+                                            </li>
+                                        }
+                                        @if (!secao.Atividades.Any())
+                                        {
+                                            <li class="list-group-item text-muted small">
+                                                <i class="bi bi-inbox me-1"></i> Nenhuma atividade ainda.
+                                            </li>
+                                        }
+                                    </ul>
+                                    @if (Model.EhProfessor)
+                                    {
+                                        <div class="p-2 border-top">
+                                            <a asp-controller="Turma" asp-action="CriarAtividade"
+                                               asp-route-secaoId="@secao.Id" asp-route-turmaId="@Model.Turma.Id"
+                                               class="btn btn-sm btn-outline-warning">
+                                                <i class="bi bi-plus-circle me-1"></i> Nova atividade
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var ativ in secao.Atividades)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <i class="bi bi-journal-check me-2 text-warning"></i>
+                                            <span class="fw-semibold">@ativ.Titulo</span>
+                                            @if (ativ.Tipo == "Avaliativa")
+                                            {
+                                                <span class="badge bg-info text-dark ms-1">Avaliativa</span>
+                                            }
+                                            @if (ativ.Prazo.HasValue)
+                                            {
+                                                <span class="badge @(ativ.Prazo < DateTime.Now ? "bg-danger" : "bg-secondary") ms-2">
+                                                    Prazo: @ativ.Prazo.Value.ToString("dd/MM/yyyy HH:mm")
+                                                </span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(ativ.Descricao))
+                                            {
+                                                <p class="text-muted small mb-0 mt-1">@ativ.Descricao</p>
+                                            }
+                                            <small class="text-muted d-block mt-1">
+                                                @ativ.Autor?.NomeCompleto — @ativ.DataPublicacao.ToString("dd/MM/yyyy HH:mm")
+                                                · Valor: @ativ.ValorMaximo pts
+                                            </small>
+                                        </div>
+                                        <div class="d-flex gap-1 ms-2">
+                                            @if (Model.EhProfessor)
+                                            {
+                                                <a asp-controller="Turma" asp-action="VerAtividade"
+                                                   asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                   class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-warning"
+                                                        data-bs-toggle="modal" data-bs-target="#copiarAtiv-@ativ.Id">
+                                                    <i class="bi bi-copy"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                @if (Model.AtividadesCorrigidas.Contains(ativ.Id))
+                                                {
+                                                    <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                       asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                       class="btn btn-sm btn-success">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Corrigida
+                                                    </a>
+                                                }
+                                                else if (Model.AtividadesEntregues.Contains(ativ.Id))
+                                                {
+                                                    <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                       asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                       class="btn btn-sm btn-info text-white">
+                                                        <i class="bi bi-clock me-1"></i> Entregue
+                                                    </a>
+                                                }
+                                                else if (ativ.Tipo == "Avaliativa")
+                                                {
+                                                    <a asp-controller="Turma" asp-action="ResponderAtividadeAval"
+                                                       asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                       class="btn btn-sm btn-warning">
+                                                        <i class="bi bi-pencil-square me-1"></i> Responder
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                       asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                       class="btn btn-sm btn-outline-warning">
+                                                        <i class="bi bi-upload me-1"></i> Entregar
+                                                    </a>
+                                                }
+                                            }
+                                        </div>
+                                    </li>
+                                }
+                                @if (!secao.Atividades.Any())
+                                {
+                                    <li class="list-group-item text-muted small">
+                                        <i class="bi bi-inbox me-1"></i> Nenhuma atividade ainda.
+                                    </li>
+                                }
+                            </ul>
+                            @if (Model.EhProfessor)
+                            {
+                                <div class="p-2 border-top">
+                                    <a asp-controller="Turma" asp-action="CriarAtividade"
+                                       asp-route-secaoId="@secao.Id" asp-route-turmaId="@Model.Turma.Id"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-plus-circle me-1"></i> Nova atividade
+                                    </a>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* Aba Pessoas *@
+        <div class="tab-pane fade" id="pessoas">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <i class="bi bi-people me-2"></i>
+                    Alunos — @Model.Turma.Alunos.Count(a => a.Ativo) matriculado(s)
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Turma.Alunos.Any(a => a.Ativo))
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nome</th>
+                                        @if (Model.EhProfessor)
+                                        {
+                                            <th>Matrícula</th>
+                                            <th>Status</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int i = 1;
+                                    }
+                                    @foreach (var aluno in Model.Turma.Alunos.Where(a => a.Ativo).OrderBy(a => a.NomeCompleto))
+                                    {
+                                        <tr>
+                                            <td class="text-muted">@(i++)</td>
+                                            <td>@aluno.NomeCompleto</td>
+                                            @if (Model.EhProfessor)
+                                            {
+                                                <td><code>@aluno.Matricula</code></td>
+                                                <td>
+                                                    @if (aluno.PrimeiroAcesso)
+                                                    {
+                                                        <span class="badge bg-warning text-dark">Aguardando 1º acesso</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-success">Ativo</span>
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-people fs-3 d-block mb-2"></i>
+                            Nenhum aluno matriculado ainda.
+                            @if (Model.EhProfessor)
+                            {
+                                <a asp-controller="Admin" asp-action="ImportarAlunos"
+                                   asp-route-turmaId="@Model.Turma.Id"
+                                   class="btn btn-outline-primary btn-sm mt-2">
+                                    <i class="bi bi-upload me-1"></i> Importar alunos
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Aba Quiz *@
+        <div class="tab-pane fade" id="quiz">
+            @if (Model.EhProfessor)
+            {
+                <div class="mb-3 text-end">
+                    <a asp-controller="Quiz" asp-action="CriarQuiz"
+                       asp-route-turmaId="@Model.Turma.Id"
+                       class="btn btn-warning">
+                        <i class="bi bi-plus-circle me-1"></i> Novo Quiz
+                    </a>
+                </div>
+            }
+            @if (!Model.Quizzes.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-1"></i> Nenhum quiz disponível ainda.
+                </div>
+            }
+            else
+            {
+                @foreach (var quiz in Model.Quizzes)
+                {
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    <i class="bi bi-lightning-fill text-warning me-2"></i>@quiz.Titulo
+                                </h6>
+                                @if (!string.IsNullOrEmpty(quiz.Descricao))
+                                {
+                                    <p class="text-muted small mb-1">@quiz.Descricao</p>
+                                }
+                                <small class="text-muted">
+                                    @quiz.Autor?.NomeCompleto —
+                                    @quiz.DataPublicacao.ToString("dd/MM/yyyy HH:mm")
+                                    · @quiz.Questoes.Count questão(ões)
+                                </small>
+                            </div>
+                            <div class="d-flex gap-1 ms-2">
+                                @if (Model.EhProfessor)
+                                {
+                                    <a asp-controller="Quiz" asp-action="VerResultados"
+                                       asp-route-quizId="@quiz.Id" asp-route-turmaId="@Model.Turma.Id"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-bar-chart me-1"></i> Resultados
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-warning"
+                                            data-bs-toggle="modal" data-bs-target="#copiarQuiz-@quiz.Id">
+                                        <i class="bi bi-copy"></i>
+                                    </button>
+                                    <form asp-controller="Quiz" asp-action="ExcluirQuiz"
+                                          method="post" class="d-inline"
+                                          onsubmit="return confirm('Excluir este quiz?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="quizId" value="@quiz.Id" />
+                                        <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Quiz" asp-action="Responder"
+                                       asp-route-quizId="@quiz.Id" asp-route-turmaId="@Model.Turma.Id"
+                                       class="btn btn-sm btn-warning">
+                                        <i class="bi bi-play-fill me-1"></i> Fazer Quiz
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+    </div>
+</div>
+
+@* Modais de cópia *@
+@if (Model.EhProfessor && Model.TurmasDoProfe.Any())
+{
+    @foreach (var quiz in Model.Quizzes)
+    {
+        <div class="modal fade" id="copiarQuiz-@quiz.Id" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Copiar Quiz — @quiz.Titulo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form asp-controller="Quiz" asp-action="CopiarQuiz" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="quizId" value="@quiz.Id" />
+                        <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                        <div class="modal-body">
+                            <label class="form-label fw-semibold">Turma destino</label>
+                            <select name="turmaDestinoId" class="form-select" required>
+                                <option value="">— Selecione —</option>
+                                @foreach (var t in Model.TurmasDoProfe)
+                                {
+                                    <option value="@t.Id">@t.NomeExibicao</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-copy me-1"></i> Copiar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+
+    @foreach (var secao in Model.Secoes)
+    {
+        @foreach (var ativ in secao.Atividades)
+        {
+            <div class="modal fade" id="copiarAtiv-@ativ.Id" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Copiar Atividade — @ativ.Titulo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form asp-controller="Turma" asp-action="CopiarAtividade" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="atividadeId" value="@ativ.Id" />
+                            <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                            <div class="modal-body">
+                                <label class="form-label fw-semibold">Seção destino</label>
+                                <select name="secaoDestinoId" class="form-select" required>
+                                    <option value="">— Selecione —</option>
+                                    @foreach (var t in Model.TurmasDoProfe)
+                                    {
+                                        <optgroup label="@t.NomeExibicao">
+                                            @foreach (var s in t.Secoes.OrderBy(s => s.Ordem))
+                                            {
+                                                <option value="@s.Id">@s.Nome</option>
+                                            }
+                                        </optgroup>
+                                    }
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-copy me-1"></i> Copiar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @foreach (var pub in secao.Publicacoes)
+        {
+            <div class="modal fade" id="copiarPub-@pub.Id" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Copiar Material — @pub.Titulo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form asp-controller="Turma" asp-action="CopiarPublicacao" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="publicacaoId" value="@pub.Id" />
+                            <input type="hidden" name="turmaId" value="@Model.Turma.Id" />
+                            <div class="modal-body">
+                                <label class="form-label fw-semibold">Seção destino</label>
+                                <select name="secaoDestinoId" class="form-select" required>
+                                    <option value="">— Selecione —</option>
+                                    @foreach (var t in Model.TurmasDoProfe)
+                                    {
+                                        <optgroup label="@t.NomeExibicao">
+                                            @foreach (var s in t.Secoes.OrderBy(s => s.Ordem))
+                                            {
+                                                <option value="@s.Id">@s.Nome</option>
+                                            }
+                                        </optgroup>
+                                    }
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-copy me-1"></i> Copiar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}

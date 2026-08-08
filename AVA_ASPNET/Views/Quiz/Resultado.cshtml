@@ -1,0 +1,107 @@
+﻿@model AVA_ASPNET.Models.ResultadoQuizViewModel
+@{
+    ViewData["Title"] = "Resultado";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4 text-center">
+                <div class="card-body py-4">
+                    <h2 class="titulo mb-1">@Model.TituloQuiz</h2>
+                    <p class="text-muted mb-3">Resultado</p>
+
+                    <div class="display-4 fw-bold @(Model.Pontuacao >= 60 ? "text-success" : "text-danger")">
+                        @Model.Pontuacao%
+                    </div>
+                    <p class="text-muted mt-2">
+                        @Model.TotalAcertos de @Model.TotalQuestoes questões corretas
+                    </p>
+
+                    @if (Model.Pontuacao >= 60)
+                    {
+                        <div class="alert alert-success mt-3">
+                            <i class="bi bi-trophy-fill me-2"></i> Parabéns! Você foi bem!
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-arrow-repeat me-2"></i> Continue praticando! Você pode tentar novamente.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <h5 class="mb-3">Gabarito</h5>
+            @for (int idx = 0; idx < Model.Questoes.Count; idx++)
+            {
+                var q = Model.Questoes[idx];
+                <div class="card mb-2 border-@(q.Acertou ? "success" : "danger")">
+                    <div class="card-body">
+                        <p class="fw-semibold mb-2">@q.Enunciado</p>
+                        <p class="mb-1">
+                            <span class="badge @(q.Acertou ? "bg-success" : "bg-danger") me-1">
+                                Sua resposta
+                            </span>
+                            @q.AlternativaEscolhida
+                        </p>
+                        @if (!q.Acertou)
+                        {
+                            <p class="mb-1 text-success">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Correta: @q.AlternativaCorreta
+                            </p>
+                        }
+                        @if ((q.TipoExplicacao == "Texto" && !string.IsNullOrEmpty(q.Explicacao)) ||
+                             (q.TipoExplicacao == "Imagem" && !string.IsNullOrEmpty(q.ExplicacaoMidiaUrl)) ||
+                             (q.TipoExplicacao == "Video" && !string.IsNullOrEmpty(q.ExplicacaoMidiaUrl)))
+                        {
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-info w-100" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#exp-@idx">
+                                    <i class="bi bi-lightbulb me-1"></i> Ver explicação
+                                </button>
+                                <div class="collapse mt-2" id="exp-@idx">
+                                    @if (q.TipoExplicacao == "Texto")
+                                    {
+                                        <div class="alert alert-info py-2 mb-0">@q.Explicacao</div>
+                                    }
+                                    else if (q.TipoExplicacao == "Imagem")
+                                    {
+                                        <img src="@q.ExplicacaoMidiaUrl" class="img-fluid rounded"
+                                             style="max-height:300px;" />
+                                    }
+                                    else if (q.TipoExplicacao == "Video")
+                                    {
+                                        var videoUrl = q.ExplicacaoMidiaUrl!
+                                            .Replace("watch?v=", "embed/")
+                                            .Replace("youtu.be/", "www.youtube.com/embed/");
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="@videoUrl" allowfullscreen></iframe>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex gap-2 mt-4">
+                <a asp-controller="Quiz" asp-action="Responder"
+                   asp-route-quizId="@Model.QuizId"
+                   asp-route-turmaId="@Model.TurmaId"
+                   class="btn btn-outline-warning">
+                    <i class="bi bi-arrow-repeat me-1"></i> Tentar novamente
+                </a>
+                <a asp-controller="Turma" asp-action="Index"
+                   asp-route-turmaId="@Model.TurmaId"
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar à turma
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

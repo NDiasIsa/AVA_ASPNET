@@ -1,31 +1,56 @@
-@{ ViewData["Title"] = "Administração"; }
+@{
+    ViewData["Title"] = "Administração";
+}
 <div class="container mt-4">
-    <h2 class="titulo mb-4">Painel de Administração</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="titulo mb-0">Painel de Administração</h2>
+        @if (ViewBag.AnoLetivo != null && ViewBag.AnoLetivo != 0)
+        {
+            <span class="badge bg-primary fs-6">
+                <i class="bi bi-calendar-check me-1"></i> Ano letivo: @ViewBag.AnoLetivo
+            </span>
+        }
+        else
+        {
+            <span class="badge bg-warning text-dark fs-6">
+                <i class="bi bi-exclamation-triangle me-1"></i> Nenhum ano letivo ativo
+            </span>
+        }
+    </div>
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body py-4">
-                    <i class="bi bi-people-fill" style="font-size:2.5rem;color:var(--cor-titulo);"></i>
+                    <i class="bi bi-people-fill" style="font-size:2rem;color:var(--cor-titulo);"></i>
                     <h3 class="mt-2 mb-0">@ViewBag.TotalAlunos</h3>
-                    <p class="text-muted mb-0">Alunos</p>
+                    <p class="text-muted mb-0 small">Alunos ativos</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body py-4">
-                    <i class="bi bi-person-workspace" style="font-size:2.5rem;color:var(--cor-titulo);"></i>
+                    <i class="bi bi-person-slash" style="font-size:2rem;color:#aaa;"></i>
+                    <h3 class="mt-2 mb-0 text-muted">@ViewBag.TotalAlunosInativos</h3>
+                    <p class="text-muted mb-0 small">Alunos inativos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body py-4">
+                    <i class="bi bi-person-workspace" style="font-size:2rem;color:var(--cor-titulo);"></i>
                     <h3 class="mt-2 mb-0">@ViewBag.TotalProfessores</h3>
-                    <p class="text-muted mb-0">Professores</p>
+                    <p class="text-muted mb-0 small">Professores</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body py-4">
-                    <i class="bi bi-door-open-fill" style="font-size:2.5rem;color:var(--cor-titulo);"></i>
+                    <i class="bi bi-door-open-fill" style="font-size:2rem;color:var(--cor-titulo);"></i>
                     <h3 class="mt-2 mb-0">@ViewBag.TotalTurmas</h3>
-                    <p class="text-muted mb-0">Turmas</p>
+                    <p class="text-muted mb-0 small">Turmas</p>
                 </div>
             </div>
         </div>
@@ -42,8 +67,22 @@
             </a>
         </div>
         <div class="col-md-4">
-            <a asp-controller="Professor" asp-action="MinhasTurmas" class="btn btn-outline-secondary w-100 py-3">
-                <i class="bi bi-door-open me-2"></i> Ver Turmas
+            <a asp-action="Turmas" class="btn btn-outline-secondary w-100 py-3">
+                <i class="bi bi-door-open me-2"></i> Gerenciar Turmas
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a asp-action="Noticias" class="btn btn-outline-secondary w-100 py-3">
+                <i class="bi bi-newspaper me-2"></i> Gerenciar Notícias
+            </a>
+        </div>
+        <div class="col-12">
+            <hr>
+            <a asp-action="IniciarAnoLetivo" class="btn btn-warning w-100 py-3">
+                <i class="bi bi-arrow-clockwise me-2"></i> Iniciar Novo Ano Letivo
+                <small class="d-block text-muted mt-1" style="font-size:.75rem;">
+                    Desvincula todos os alunos — reimporte o CSV das turma novamente para vincular os alunos às turmas novas.
+                </small>
             </a>
         </div>
     </div>

@@ -22,6 +22,232 @@ namespace AVA_ASPNET.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AVA_ASPNET.Models.Alternativa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Correta")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("QuestaoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestaoId");
+
+                    b.ToTable("Alternativas");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.AnoLetivo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Ano")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DataFim")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataInicio")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Ativo");
+
+                    b.ToTable("AnosLetivos");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Atividade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ArquivoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataPublicacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomeArquivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Prazo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SecaoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("ValorMaximo")
+                        .HasColumnType("decimal(4,1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.HasIndex("SecaoId");
+
+                    b.ToTable("Atividades");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Aviso", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataPublicacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.HasIndex("TurmaId");
+
+                    b.ToTable("Avisos");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.EntregaAtividade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ArquivoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AtividadeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Corrigida")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("DataEntrega")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Feedback")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomeArquivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Nota")
+                        .HasColumnType("decimal(4,1)");
+
+                    b.Property<string>("TextoResposta")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlunoId");
+
+                    b.HasIndex("AtividadeId", "AlunoId")
+                        .IsUnique();
+
+                    b.ToTable("EntregasAtividade");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Noticia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Card")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Conteudo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorTitulo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataPublicacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Destaque")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ImagemCardUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagemUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Publicada")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Resumo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.ToTable("Noticias");
+                });
+
             modelBuilder.Entity("AVA_ASPNET.Models.Perfil", b =>
                 {
                     b.Property<int>("Id")
@@ -29,6 +255,9 @@ namespace AVA_ASPNET.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
 
                     b.Property<string>("FotoUrl")
                         .HasColumnType("nvarchar(max)");
@@ -93,6 +322,181 @@ namespace AVA_ASPNET.Migrations
                         .IsUnique();
 
                     b.ToTable("ProfessorTurmas");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Publicacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataPublicacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomeArquivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SecaoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.HasIndex("SecaoId");
+
+                    b.ToTable("Publicacoes");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Questao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Enunciado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagemUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Ordem")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("Questoes");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Quiz", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataPublicacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.HasIndex("TurmaId");
+
+                    b.ToTable("Quizzes");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.ResultadoQuiz", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataRealizacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Pontuacao")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalAcertos")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalQuestoes")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlunoId");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("ResultadosQuiz");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Secao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Ordem")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TurmaId");
+
+                    b.ToTable("Secoes");
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Turma", b =>
@@ -326,6 +730,85 @@ namespace AVA_ASPNET.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("AVA_ASPNET.Models.Alternativa", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Questao", "Questao")
+                        .WithMany("Alternativas")
+                        .HasForeignKey("QuestaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Questao");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Atividade", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AVA_ASPNET.Models.Secao", "Secao")
+                        .WithMany("Atividades")
+                        .HasForeignKey("SecaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Autor");
+
+                    b.Navigation("Secao");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Aviso", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AVA_ASPNET.Models.Turma", "Turma")
+                        .WithMany("Avisos")
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Autor");
+
+                    b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.EntregaAtividade", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Aluno")
+                        .WithMany()
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AVA_ASPNET.Models.Atividade", "Atividade")
+                        .WithMany("Entregas")
+                        .HasForeignKey("AtividadeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("Atividade");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Noticia", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Autor");
+                });
+
             modelBuilder.Entity("AVA_ASPNET.Models.Perfil", b =>
                 {
                     b.HasOne("AVA_ASPNET.Models.Turma", "Turma")
@@ -359,6 +842,85 @@ namespace AVA_ASPNET.Migrations
                         .IsRequired();
 
                     b.Navigation("Perfil");
+
+                    b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Publicacao", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AVA_ASPNET.Models.Secao", "Secao")
+                        .WithMany("Publicacoes")
+                        .HasForeignKey("SecaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Autor");
+
+                    b.Navigation("Secao");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Questao", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Quiz", "Quiz")
+                        .WithMany("Questoes")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Quiz", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AVA_ASPNET.Models.Turma", "Turma")
+                        .WithMany("Quizzes")
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Autor");
+
+                    b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.ResultadoQuiz", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Aluno")
+                        .WithMany()
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AVA_ASPNET.Models.Quiz", "Quiz")
+                        .WithMany("Resultados")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Secao", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Turma", "Turma")
+                        .WithMany("Secoes")
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Turma");
                 });
@@ -425,16 +987,46 @@ namespace AVA_ASPNET.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("AVA_ASPNET.Models.Atividade", b =>
+                {
+                    b.Navigation("Entregas");
+                });
+
             modelBuilder.Entity("AVA_ASPNET.Models.Perfil", b =>
                 {
                     b.Navigation("ProfessorTurmas");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Questao", b =>
+                {
+                    b.Navigation("Alternativas");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Quiz", b =>
+                {
+                    b.Navigation("Questoes");
+
+                    b.Navigation("Resultados");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.Secao", b =>
+                {
+                    b.Navigation("Atividades");
+
+                    b.Navigation("Publicacoes");
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Turma", b =>
                 {
                     b.Navigation("Alunos");
 
+                    b.Navigation("Avisos");
+
                     b.Navigation("ProfessorTurmas");
+
+                    b.Navigation("Quizzes");
+
+                    b.Navigation("Secoes");
                 });
 #pragma warning restore 612, 618
         }

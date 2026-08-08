@@ -1,0 +1,216 @@
+﻿@model AVA_ASPNET.Models.QuizViewModel
+@{
+    ViewData["Title"] = "Novo Quiz";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="titulo mb-4">Novo Quiz</h2>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="CriarQuiz" method="post" id="formQuiz" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="TurmaId" />
+
+                        <div class="mb-3">
+                            <label asp-for="Titulo" class="form-label fw-semibold"></label>
+                            <input asp-for="Titulo" class="form-control" placeholder="Título do quiz" />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="2"
+                                      placeholder="Descrição opcional"></textarea>
+                        </div>
+                        <div class="mb-4 form-check">
+                            <input asp-for="Ativo" class="form-check-input" />
+                            <label asp-for="Ativo" class="form-check-label"></label>
+                        </div>
+
+                        <hr>
+                        <h5 class="mb-3">Questões</h5>
+
+                        <div id="questoes">
+                            @for (int qi = 0; qi < Model.Questoes.Count; qi++)
+                            {
+                                <div class="card mb-3 questao-card">
+                                    <div class="card-header fw-semibold">
+                                        Questão @(qi + 1)
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Enunciado</label>
+                                            <textarea name="Questoes[@qi].Enunciado"
+                                                      class="form-control" rows="2"
+                                                      placeholder="Digite a pergunta..." required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small">
+                                                <i class="bi bi-image me-1"></i> Imagem do enunciado (opcional)
+                                            </label>
+                                            <input type="file" name="Questoes[@qi].Imagem"
+                                                   class="form-control form-control-sm" accept="image/*" />
+                                        </div>
+                                        <label class="form-label fw-semibold">Alternativas</label>
+                                        @for (int ai = 0; ai < 4; ai++)
+                                        {
+                                            <div class="input-group mb-2">
+                                                <div class="input-group-text">
+                                                    <input type="radio"
+                                                           name="Questoes[@qi].CorretoIndex"
+                                                           value="@ai"
+                                                           title="Marcar como correta" />
+                                                </div>
+                                                <input type="text"
+                                                       name="Questoes[@qi].Alternativas[@ai].Texto"
+                                                       class="form-control"
+                                                       placeholder="Alternativa @((char)('A' + ai))" />
+                                                <input type="hidden"
+                                                       name="Questoes[@qi].Alternativas[@ai].Correta"
+                                                       value="false" />
+                                            </div>
+                                        }
+
+                                        <div class="form-text text-muted mb-3">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Selecione o radio ao lado da alternativa correta.
+                                        </div>
+                                        <div class="mt-3">
+                                            <label class="form-label text-muted small fw-semibold">
+                                                <i class="bi bi-lightbulb me-1"></i> Explicação (aparece no gabarito)
+                                            </label>
+                                            <select name="Questoes[@qi].TipoExplicacao" class="form-select form-select-sm mb-2"
+                                                    onchange="toggleExplicacao(this, @qi)">
+                                                <option value="Texto">Texto</option>
+                                                <option value="Imagem">Imagem</option>
+                                                <option value="Video">Vídeo (YouTube)</option>
+                                            </select>
+                                            <div id="exp-texto-@qi">
+                                                <textarea name="Questoes[@qi].Explicacao" class="form-control form-control-sm" rows="2"
+                                                          placeholder="Explique o raciocínio..."></textarea>
+                                            </div>
+                                            <div id="exp-imagem-@qi" style="display:none;">
+                                                <input type="file" name="Questoes[@qi].ExplicacaoImagem"
+                                                       class="form-control form-control-sm" accept="image/*" />
+                                            </div>
+                                            <div id="exp-video-@qi" style="display:none;">
+                                                <input type="text" name="Questoes[@qi].ExplicacaoVideoUrl"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="https://youtube.com/watch?v=..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <button type="button" class="btn btn-outline-secondary mb-4"
+                                onclick="adicionarQuestao()">
+                            <i class="bi bi-plus-circle me-1"></i> Adicionar questão
+                        </button>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle me-1"></i> Salvar Quiz
+                            </button>
+                            <a asp-controller="Turma" asp-action="Index"
+                               asp-route-turmaId="@Model.TurmaId"
+                               class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let questaoIndex = @Model.Questoes.Count;
+
+        function toggleExplicacao(select, qi) {
+            document.getElementById(`exp-texto-${qi}`).style.display = select.value === 'Texto' ? 'block' : 'none';
+            document.getElementById(`exp-imagem-${qi}`).style.display = select.value === 'Imagem' ? 'block' : 'none';
+            document.getElementById(`exp-video-${qi}`).style.display = select.value === 'Video' ? 'block' : 'none';
+        }
+
+        function adicionarQuestao() {
+            const qi = questaoIndex++;
+            const div = document.createElement('div');
+            div.className = 'card mb-3 questao-card';
+            div.innerHTML = `
+                <div class="card-header fw-semibold">Questão ${qi + 1}</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Enunciado</label>
+                        <textarea name="Questoes[${qi}].Enunciado" class="form-control" rows="2"
+                                  placeholder="Digite a pergunta..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">
+                            <i class="bi bi-image me-1"></i> Imagem do enunciado (opcional)
+                        </label>
+                        <input type="file" name="Questoes[${qi}].Imagem"
+                               class="form-control form-control-sm" accept="image/*" />
+                    </div>
+                    <label class="form-label fw-semibold">Alternativas</label>
+                    ${['A', 'B', 'C', 'D'].map((letra, ai) => `
+                        <div class="input-group mb-2">
+                            <div class="input-group-text">
+                                <input type="radio" name="Questoes[${qi}].CorretoIndex" value="${ai}"
+                                       title="Marcar como correta" />
+                            </div>
+                            <input type="text" name="Questoes[${qi}].Alternativas[${ai}].Texto"
+                                   class="form-control" placeholder="Alternativa ${letra}" />
+                            <input type="hidden" name="Questoes[${qi}].Alternativas[${ai}].Correta"
+                                   value="false" />
+                        </div>
+                    `).join('')}
+                    <div class="form-text text-muted mb-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Selecione o radio ao lado da alternativa correta.
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label text-muted small fw-semibold">
+                            <i class="bi bi-lightbulb me-1"></i> Explicação (aparece no gabarito)
+                        </label>
+                        <select name="Questoes[${qi}].TipoExplicacao" class="form-select form-select-sm mb-2"
+                                onchange="toggleExplicacao(this, ${qi})">
+                            <option value="Texto">Texto</option>
+                            <option value="Imagem">Imagem</option>
+                            <option value="Video">Vídeo (YouTube)</option>
+                        </select>
+                        <div id="exp-texto-${qi}">
+                            <textarea name="Questoes[${qi}].Explicacao" class="form-control form-control-sm" rows="2"
+                                      placeholder="Explique o raciocínio..."></textarea>
+                        </div>
+                        <div id="exp-imagem-${qi}" style="display:none;">
+                            <input type="file" name="Questoes[${qi}].ExplicacaoImagem"
+                                   class="form-control form-control-sm" accept="image/*" />
+                        </div>
+                        <div id="exp-video-${qi}" style="display:none;">
+                            <input type="text" name="Questoes[${qi}].ExplicacaoVideoUrl"
+                                   class="form-control form-control-sm"
+                                   placeholder="https://youtube.com/watch?v=..." />
+                        </div>
+                    </div>
+                </div>`;
+            document.getElementById('questoes').appendChild(div);
+        }
+
+        document.getElementById('formQuiz').addEventListener('submit', function() {
+            const cards = document.querySelectorAll('.questao-card');
+            cards.forEach((card, qi) => {
+                const radios = card.querySelectorAll('input[type=radio]');
+                const hiddens = card.querySelectorAll('input[type=hidden][name*="Correta"]');
+                hiddens.forEach(h => h.value = 'false');
+                radios.forEach((radio, ai) => {
+                    if (radio.checked && hiddens[ai]) {
+                        hiddens[ai].value = 'true';
+                    }
+                });
+            });
+        });
+    </script>
+}

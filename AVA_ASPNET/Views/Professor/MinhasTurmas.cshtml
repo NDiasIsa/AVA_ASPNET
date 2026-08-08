@@ -1,18 +1,21 @@
 @model List<AVA_ASPNET.Models.Turma>
-@{ ViewData["Title"] = "Minhas Turmas"; }
+@{
+    ViewData["Title"] = "Minhas Turmas";
+}
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="titulo mb-0">Minhas Turmas</h2>
-        <a asp-action="CriarTurma" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Nova Turma
+        <a asp-action="VisaoGeral" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-bar-chart me-1"></i> Visão Geral
         </a>
     </div>
 
     @if (!Model.Any())
     {
         <div class="alert alert-info">
-            <i class="bi bi-info-circle me-1"></i> Você ainda não criou nenhuma turma.
+            <i class="bi bi-info-circle me-1"></i> Nenhuma turma associada a você ainda.
+            Aguarde o administrador associar suas turmas.
         </div>
     }
     else
@@ -35,14 +38,10 @@
                                 <i class="bi bi-people me-1"></i> @turma.Alunos.Count aluno(s)
                             </span>
                         </div>
-                        <div class="card-footer bg-transparent d-flex gap-2">
-                            <a asp-action="AlunosDaTurma" asp-route-turmaId="@turma.Id"
-                               class="btn btn-sm btn-outline-primary flex-fill">
-                                <i class="bi bi-people me-1"></i> Alunos
-                            </a>
-                            <a asp-action="ImportarAlunos" asp-route-turmaId="@turma.Id"
-                               class="btn btn-sm btn-outline-secondary flex-fill">
-                                <i class="bi bi-upload me-1"></i> Importar
+                        <div class="card-footer bg-transparent">
+                            <a asp-controller="Turma" asp-action="Index" asp-route-turmaId="@turma.Id"
+                               class="btn btn-sm btn-outline-primary w-100">
+                                <i class="bi bi-door-open me-1"></i> Abrir Turma
                             </a>
                         </div>
                     </div>

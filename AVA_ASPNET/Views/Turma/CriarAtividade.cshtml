@@ -1,0 +1,149 @@
+﻿@model AVA_ASPNET.Models.AtividadeViewModel
+@{
+    ViewData["Title"] = "Nova Atividade";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="titulo mb-1">Nova Atividade</h2>
+            <p class="text-muted mb-4">Seção: <strong>@Model.NomeSecao</strong></p>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="CriarAtividade" method="post" enctype="multipart/form-data" id="formAtividade">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="SecaoId" />
+                        <input type="hidden" asp-for="TurmaId" />
+                        <input type="hidden" asp-for="NomeSecao" />
+
+                        <div class="mb-3">
+                            <label asp-for="Titulo" class="form-label fw-semibold"></label>
+                            <input asp-for="Titulo" class="form-control" placeholder="Título da atividade" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Tipo" class="form-label fw-semibold"></label>
+                            <select asp-for="Tipo" class="form-select" id="tipoAtividade"
+                                    onchange="toggleTipo(this.value)">
+                                <option value="Entrega">Entrega de arquivo/texto</option>
+                                <option value="Avaliativa">Atividade com alternativas</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3"
+                                      placeholder="Enunciado, instruções..."></textarea>
+                        </div>
+
+                        @* Campos só para Entrega *@
+                        <div id="camposEntrega">
+                            <div class="mb-3">
+                                <label asp-for="Arquivo" class="form-label fw-semibold"></label>
+                                <input asp-for="Arquivo" type="file" class="form-control" />
+                                <div class="form-text">Anexo opcional (PDF, imagem, etc.)</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label asp-for="Prazo" class="form-label fw-semibold"></label>
+                                <input type="datetime-local" name="Prazo" class="form-control" step="60"
+                                       value="@(Model.Prazo.HasValue ? Model.Prazo.Value.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.AddDays(7).ToString("yyyy-MM-ddTHH:mm"))" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="ValorMaximo" class="form-label fw-semibold"></label>
+                                <input asp-for="ValorMaximo" type="number" class="form-control"
+                                       min="0" max="10" step="0.5" />
+                            </div>
+                        </div>
+
+                        @* Questões (só para Avaliativa) *@
+                        <div id="camposAvaliativa" style="display:none;">
+                            <hr>
+                            <h5 class="mb-3">Questões</h5>
+                            <div id="questoesAtiv"></div>
+                            <button type="button" class="btn btn-outline-secondary mb-4"
+                                    onclick="adicionarQuestaoAtiv()">
+                                <i class="bi bi-plus-circle me-1"></i> Adicionar questão
+                            </button>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle me-1"></i> Publicar Atividade
+                            </button>
+                            <a asp-action="Index" asp-route-turmaId="@Model.TurmaId"
+                               class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let questaoAtivIndex = 0;
+
+        function toggleTipo(valor) {
+            document.getElementById('camposEntrega').style.display = valor === 'Entrega' ? 'block' : 'none';
+            document.getElementById('camposAvaliativa').style.display = valor === 'Avaliativa' ? 'block' : 'none';
+        }
+
+        function adicionarQuestaoAtiv() {
+            const qi = questaoAtivIndex++;
+            const div = document.createElement('div');
+            div.className = 'card mb-3 questao-ativ-card';
+            div.innerHTML = `
+                <div class="card-header fw-semibold">Questão ${qi + 1}</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Enunciado</label>
+                        <textarea name="Questoes[${qi}].Enunciado" class="form-control" rows="2"
+                                  placeholder="Digite a pergunta..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">
+                            <i class="bi bi-image me-1"></i> Imagem (opcional)
+                        </label>
+                        <input type="file" name="Questoes[${qi}].Imagem"
+                               class="form-control form-control-sm" accept="image/*" />
+                    </div>
+                    <label class="form-label fw-semibold">Alternativas</label>
+                    ${['A', 'B', 'C', 'D'].map((letra, ai) => `
+                        <div class="input-group mb-2">
+                            <div class="input-group-text">
+                                <input type="radio" name="Questoes[${qi}].CorretoIndex" value="${ai}"
+                                       title="Marcar como correta" />
+                            </div>
+                            <input type="text" name="Questoes[${qi}].Alternativas[${ai}].Texto"
+                                   class="form-control" placeholder="Alternativa ${letra}" />
+                            <input type="hidden" name="Questoes[${qi}].Alternativas[${ai}].Correta"
+                                   value="false" />
+                        </div>
+                    `).join('')}
+                    <div class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Selecione o radio ao lado da alternativa correta.
+                    </div>
+                </div>`;
+            document.getElementById('questoesAtiv').appendChild(div);
+        }
+
+        document.getElementById('formAtividade').addEventListener('submit', function() {
+            const cards = document.querySelectorAll('.questao-ativ-card');
+            cards.forEach((card, qi) => {
+                const radios = card.querySelectorAll('input[type=radio]');
+                const hiddens = card.querySelectorAll('input[type=hidden][name*="Correta"]');
+                hiddens.forEach(h => h.value = 'false');
+                radios.forEach((radio, ai) => {
+                    if (radio.checked && hiddens[ai]) {
+                        hiddens[ai].value = 'true';
+                    }
+                });
+            });
+        });
+    </script>
+}

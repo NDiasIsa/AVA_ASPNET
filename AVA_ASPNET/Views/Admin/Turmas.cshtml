@@ -1,25 +1,85 @@
 @model List<AVA_ASPNET.Models.Turma>
-@{ ViewData["Title"] = "Turmas"; }
+@{
+    ViewData["Title"] = "Turmas";
+}
+
 <div class="container mt-4">
-    <h2 class="titulo mb-4">Todas as Turmas</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="titulo mb-0">Turmas</h2>
+        <a asp-action="CriarTurma" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Nova Turma
+        </a>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead class="table-light">
-                <tr><th>Turma</th><th>Ano EM</th><th>Ano letivo</th><th>Professor</th><th>Alunos</th></tr>
+                <tr>
+                    <th>Turma</th>
+                    <th>Ano EM</th>
+                    <th>Professor</th>
+                    <th>Alunos</th>
+                    <th>Ações</th>
+                </tr>
             </thead>
             <tbody>
                 @foreach (var t in Model)
                 {
                     <tr>
-                        <td><strong>@t.Codigo</strong> @(t.Descricao != null ? $"— {t.Descricao}" : "")</td>
+                        <td>
+                            <strong>@t.Codigo</strong>
+                            @if (t.Descricao != null)
+                            {
+                                <span class="text-muted ms-1">— @t.Descricao</span>
+                            }
+                        </td>
                         <td>@t.Ano º EM</td>
-                        <td>@t.AnoLetivo</td>
-                        <td>@(t.Professor?.NomeCompleto ?? "—")</td>
-                        <td><span class="badge bg-secondary">@t.Alunos.Count</span></td>
+                        <td>
+                            @if (t.Professor != null && t.Professor.TipoUsuario == "Professor")
+                            {
+                                @t.Professor.NomeCompleto
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Sem professor</span>
+                            }
+                        </td>
+                        <td><span class="badge bg-secondary">@t.Alunos.Count(a => a.Ativo)</span></td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                <a asp-action="ImportarAlunos" asp-route-turmaId="@t.Id"
+                                   class="btn btn-sm btn-outline-primary" title="Importar alunos">
+                                    <i class="bi bi-upload"></i>
+                                </a>
+                                <a asp-area="Professor" asp-controller="Professor" asp-action="AlunosDaTurma"
+                                   asp-route-turmaId="@t.Id"
+                                   class="btn btn-sm btn-outline-secondary" title="Ver alunos">
+                                    <i class="bi bi-people"></i>
+                                </a>
+                                <a asp-action="AssociarProfessor" asp-route-turmaId="@t.Id"
+                                   class="btn btn-sm btn-outline-secondary" title="Associar professor">
+                                    <i class="bi bi-person-workspace"></i>
+                                </a>
+                                <a asp-action="EditarTurma" asp-route-id="@t.Id"
+                                   class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="ExcluirTurma" method="post" class="d-inline"
+                                      onsubmit="return confirm('Excluir turma @t.Codigo? Os alunos serão desvinculados.')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@t.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-    <a asp-action="Index" class="btn btn-link"><i class="bi bi-arrow-left"></i> Voltar ao painel</a>
+    <a asp-action="Index" class="btn btn-link mt-2">
+        <i class="bi bi-arrow-left"></i> Voltar ao painel
+    </a>
 </div>

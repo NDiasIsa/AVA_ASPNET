@@ -24,6 +24,12 @@ namespace AVA_ASPNET.Models
         /// </summary>
         public bool PrimeiroAcesso { get; set; } = true;
 
+        /// <summary>E-mail pessoal do aluno para recuperação de senha</summary>
+        public string? EmailPessoal { get; set; }
+
+        /// <summary>false = desativado na virada de ano ou saiu da escola</summary>
+        public bool Ativo { get; set; } = true;
+
         // Aluno pertence a UMA turma por vez
         public int? TurmaId { get; set; }
 

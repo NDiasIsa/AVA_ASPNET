@@ -1,37 +1,36 @@
 using AVA_ASPNET.Models;
-using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Identity;
-using System.Globalization;
+using Microsoft.Extensions.Configuration;
 
 namespace AVA_ASPNET.Data
 {
     public static class SeedData
     {
-        public static async Task InicializarAsync(IServiceProvider services)
+        public static async Task InicializarAsync(IServiceProvider serviceProvider)
         {
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-            var db = services.GetRequiredService<AppDbContext>();
-            var streams = new Stream[]
+            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var config = serviceProvider.GetRequiredService<IConfiguration>();
+
+            // Criar roles
+            string[] roles = { "Admin", "Professor", "Aluno" };
+            foreach (var role in roles)
             {
-                //bota os arquivos CSV que você quer ler aq (já ta na raiz do projeto aí)
-                File.OpenRead(/*bota o caminho aq*/),
-            };
-
-            await db.Database.EnsureCreatedAsync();
-
-            // Roles
-            foreach (var role in new[] { "Admin", "Professor", "Aluno" })
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole(role));
+            }
 
-            // Admin padrão
-            const string adminEmail = "admin@quantumpinheiral.ifrj.edu.br";
-            const string adminSenha = "[Admin@123]"; 
+            // Ler credenciais dos User Secrets
+            var adminEmail = config["AdminEmail"]
+                ?? throw new InvalidOperationException("AdminEmail não configurado nos User Secrets.");
+            var adminSenha = config["AdminSenha"]
+                ?? throw new InvalidOperationException("AdminSenha não configurado nos User Secrets.");
 
-            if (await userManager.FindByEmailAsync(adminEmail) == null)
+            // Criar admin se não existir
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
             {
-                var adminUser = new IdentityUser
+                adminUser = new IdentityUser
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
@@ -42,61 +41,17 @@ namespace AVA_ASPNET.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, "Admin");
+
+                    var db = serviceProvider.GetRequiredService<AppDbContext>();
                     db.Perfis.Add(new Perfil
                     {
                         UserId = adminUser.Id,
                         TipoUsuario = "Admin",
                         NomeCompleto = "Administrador",
-                        Matricula = null,
-                        PrimeiroAcesso = false
+                        PrimeiroAcesso = false,
+                        Ativo = true
                     });
                     await db.SaveChangesAsync();
-                }
-            }
-
-            //aq ele já lê o CSV e cria os usuários
-            LerCsv(streams, userManager, roleManager, db).Wait();
-        }
-
-        public static async Task LerCsv(Stream[] streams, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, AppDbContext db)
-        {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = ";",
-                HeaderValidated = null,
-                MissingFieldFound = null
-            };
-            foreach (var stream in streams)
-            {
-                using var reader = new StreamReader(stream);
-                using var csv = new CsvHelper.CsvReader(reader, config);
-                var records = csv.GetRecords<LinhaCsvDto>().ToList();
-
-                foreach (var record in records)
-                {
-                    if (await userManager.FindByEmailAsync(record.Matricula + "@quantumpinheiral.ifrj.edu.br") == null)
-                    {
-                        var user = new IdentityUser
-                        {
-                            UserName = record.Matricula,
-                            Email = record.Matricula + "@quantumpinheiral.ifrj.edu.br",
-                            EmailConfirmed = true
-                        };
-                        var result = await userManager.CreateAsync(user, "[Aluno@123]");
-                        if (result.Succeeded)
-                        {
-                            await userManager.AddToRoleAsync(user, "Aluno");
-                            db.Perfis.Add(new Perfil
-                            {
-                                UserId = user.Id,
-                                TipoUsuario = "Aluno",
-                                NomeCompleto = record.NomeAluno,
-                                Matricula = record.Matricula,
-                                PrimeiroAcesso = true
-                            });
-                            await db.SaveChangesAsync();
-                        }
-                    }
                 }
             }
         }

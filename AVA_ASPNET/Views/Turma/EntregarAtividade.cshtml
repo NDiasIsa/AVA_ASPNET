@@ -1,0 +1,119 @@
+﻿@model AVA_ASPNET.Models.EntregarAtividadeViewModel
+@{
+    ViewData["Title"] = "Entregar Atividade";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <h2 class="titulo mb-1">@Model.TituloAtividade</h2>
+            @if (Model.Prazo.HasValue)
+            {
+                <p class="text-muted mb-1">
+                    <span class="badge @(Model.Prazo < DateTime.Now ? "bg-danger" : "bg-secondary")">
+                        Prazo: @Model.Prazo.Value.ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                    <span class="badge bg-primary ms-1">Valor: @Model.ValorMaximo pts</span>
+                </p>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.DescricaoAtividade))
+            {
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <p class="mb-0">@Model.DescricaoAtividade</p>
+                        @if (!string.IsNullOrEmpty(Model.ArquivoAtividadeUrl))
+                        {
+                            <a href="@Model.ArquivoAtividadeUrl" target="_blank"
+                               class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="bi bi-paperclip me-1"></i> Ver anexo
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (Model.EntregaExistente != null)
+            {
+                <div class="alert @(Model.EntregaExistente.Corrigida ? "alert-success" : "alert-info") mb-3">
+                    @if (Model.EntregaExistente.Corrigida)
+                    {
+                        <strong><i class="bi bi-check-circle me-1"></i>Corrigida!</strong>
+                        <p class="mb-1 mt-1">Nota: <strong>@Model.EntregaExistente.Nota / @Model.ValorMaximo</strong></p>
+                        @if (!string.IsNullOrEmpty(Model.EntregaExistente.Feedback))
+                        {
+                            <p class="mb-0">Feedback: @Model.EntregaExistente.Feedback</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="mb-1">
+                            <i class="bi bi-clock me-1"></i>
+                            <strong>Entregue</strong> em @Model.EntregaExistente.DataEntrega.ToString("dd/MM/yyyy HH:mm") - aguardando correcao.
+                        </p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.EntregaExistente.NomeArquivo))
+                    {
+                        <a asp-controller="Arquivo" asp-action="Entrega"
+                           asp-route-entregaId="@Model.EntregaExistente.Id"
+                           target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                            <i class="bi bi-paperclip me-1"></i> @Model.EntregaExistente.NomeArquivo
+                        </a>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.EntregaExistente.TextoResposta))
+                    {
+                        <div class="border rounded p-2 bg-white mt-2">
+                            <small class="text-muted">Sua resposta:</small>
+                            <p class="mb-0">@Model.EntregaExistente.TextoResposta</p>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.EntregaExistente?.Corrigida == true)
+            {
+                <div class="alert alert-secondary">
+                    <i class="bi bi-lock-fill me-1"></i>
+                    Esta atividade já foi corrigida e não pode ser reenviada.
+                    <a asp-controller="Turma" asp-action="Index" asp-route-turmaId="@Model.TurmaId"
+                       class="btn btn-sm btn-outline-secondary ms-2">
+                        <i class="bi bi-arrow-left me-1"></i> Voltar
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h6 class="fw-semibold mb-3">
+                            @(Model.EntregaExistente != null ? "Reenviar entrega" : "Sua entrega")
+                        </h6>
+                        <form asp-action="EntregarAtividade" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="AtividadeId" />
+                            <input type="hidden" asp-for="TurmaId" />
+
+                            <div class="mb-3">
+                                <label asp-for="Arquivo" class="form-label fw-semibold"></label>
+                                <input asp-for="Arquivo" type="file" class="form-control" />
+                            </div>
+                            <div class="mb-4">
+                                <label asp-for="TextoResposta" class="form-label fw-semibold"></label>
+                                <textarea asp-for="TextoResposta" class="form-control" rows="4"
+                                          placeholder="Escreva sua resposta aqui (opcional se enviar arquivo)">
+                    </textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-upload me-1"></i> Entregar
+                                </button>
+                                <a asp-controller="Turma" asp-action="Index" asp-route-turmaId="@Model.TurmaId"
+                                   class="btn btn-outline-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

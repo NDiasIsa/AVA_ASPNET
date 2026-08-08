@@ -1,0 +1,83 @@
+﻿@model AVA_ASPNET.Models.PublicacaoViewModel
+@{
+    ViewData["Title"] = "Editar Publicação";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <h2 class="titulo mb-1">Editar Publicação</h2>
+            <p class="text-muted mb-4">Seção: <strong>@Model.NomeSecao</strong></p>
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="EditarPublicacao" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="SecaoId" />
+                        <input type="hidden" asp-for="TurmaId" />
+                        <input type="hidden" asp-for="NomeSecao" />
+
+                        <div class="mb-3">
+                            <label asp-for="Titulo" class="form-label fw-semibold"></label>
+                            <input asp-for="Titulo" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Tipo" class="form-label fw-semibold"></label>
+                            <select asp-for="Tipo" class="form-select" id="tipoSelect">
+                                <option value="Arquivo">Arquivo</option>
+                                <option value="Link">Link</option>
+                            </select>
+                        </div>
+
+                        <div id="campoArquivo" class="mb-3">
+                            <label asp-for="Arquivo" class="form-label fw-semibold"></label>
+                            @if (!string.IsNullOrEmpty(Model.NomeArquivoAtual))
+                            {
+                                <div class="mb-2">
+                                    <i class="bi bi-paperclip me-1"></i>
+                                    <a href="@Model.UrlAtual" target="_blank">@Model.NomeArquivoAtual</a>
+                                    <span class="text-muted small ms-1">— envie um novo para substituir</span>
+                                </div>
+                            }
+                            <input asp-for="Arquivo" type="file" class="form-control" />
+                        </div>
+
+                        <div id="campoLink" class="mb-3" style="display:none;">
+                            <label asp-for="Link" class="form-label fw-semibold"></label>
+                            <input asp-for="Link" class="form-control" value="@Model.UrlAtual"
+                                   placeholder="https://youtube.com/..." />
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i> Salvar
+                            </button>
+                            <a asp-action="Index" asp-route-turmaId="@Model.TurmaId"
+                               class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const tipoSelect = document.getElementById('tipoSelect');
+        function toggleCampos() {
+            const isArquivo = tipoSelect.value === 'Arquivo';
+            document.getElementById('campoArquivo').style.display = isArquivo ? 'block' : 'none';
+            document.getElementById('campoLink').style.display = isArquivo ? 'none' : 'block';
+        }
+        tipoSelect.addEventListener('change', toggleCampos);
+        toggleCampos(); // aplica ao carregar
+    </script>
+}

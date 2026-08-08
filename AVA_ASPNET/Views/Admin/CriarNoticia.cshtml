@@ -1,0 +1,110 @@
+﻿@model AVA_ASPNET.Models.NoticiaViewModel
+@{
+    ViewData["Title"] = "Nova Notícia";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <h2 class="titulo mb-4">Nova Notícia</h2>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="CriarNoticia" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="All" class="alert alert-danger"
+                             style="display:@(ViewData.ModelState.ErrorCount > 0 ? "block" : "none")"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Titulo" class="form-label fw-semibold"></label>
+                            <input asp-for="Titulo" class="form-control" placeholder="Título da notícia" />
+                            <span asp-validation-for="Titulo" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Resumo" class="form-label fw-semibold"></label>
+                            <input asp-for="Resumo" class="form-control"
+                                   placeholder="Breve resumo (aparece na listagem)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImagemCapa" class="form-label fw-semibold"></label>
+                            <input asp-for="ImagemCapa" type="file" class="form-control" accept="image/*" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImagemCard" class="form-label fw-semibold"></label>
+                            <input asp-for="ImagemCard" type="file" class="form-control" accept="image/*" />
+                            <div class="form-text">Imagem que aparece na seção de cards da Home.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Conteúdo</label>
+                            <div id="editor" style="height: 300px;"></div>
+                            <input type="hidden" asp-for="Conteudo" id="conteudo-hidden" />
+                            <span asp-validation-for="Conteudo" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3 d-flex gap-4 flex-wrap">
+                            <div class="form-check">
+                                <input asp-for="Publicada" class="form-check-input" />
+                                <label asp-for="Publicada" class="form-check-label"></label>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="CorTitulo" class="form-label fw-semibold"></label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <input asp-for="CorTitulo" type="color" class="form-control form-control-color" />
+                                    <span class="text-muted small">Cor do título que aparece sobre a imagem no carousel</span>
+                                </div>
+                            </div>
+
+                            <div class="form-check">
+                                <input asp-for="Destaque" class="form-check-input" />
+                                <label asp-for="Destaque" class="form-check-label"></label>
+                            </div>
+                            <div class="form-check">
+                                <input asp-for="Card" class="form-check-input" />
+                                <label asp-for="Card" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" id="btn-salvar">
+                                <i class="bi bi-check-circle me-1"></i> Salvar
+                            </button>
+                            <a asp-action="Noticias" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script>
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['link'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Escreva o conteúdo da notícia...'
+        });
+
+        document.getElementById('btn-salvar').addEventListener('click', function() {
+            document.getElementById('conteudo-hidden').value = quill.root.innerHTML;
+        });
+    </script>
+}

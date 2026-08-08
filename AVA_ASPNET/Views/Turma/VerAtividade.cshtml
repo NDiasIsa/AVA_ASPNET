@@ -1,0 +1,161 @@
+﻿@model AVA_ASPNET.Models.Atividade
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h2 class="titulo mb-1">@Model.Titulo</h2>
+            <p class="text-muted mb-0">
+                @if (Model.Prazo.HasValue)
+                {
+                    <span class="badge @(Model.Prazo < DateTime.Now ? "bg-danger" : "bg-secondary") me-2">
+                        Prazo: @Model.Prazo.Value.ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                }
+                <span class="badge bg-primary">Valor: @Model.ValorMaximo pts</span>
+                @if (Model.Tipo == "Avaliativa")
+                {
+                    <span class="badge bg-info text-dark ms-1">Avaliativa</span>
+                }
+            </p>
+        </div>
+        <a asp-action="Index" asp-route-turmaId="@ViewBag.TurmaId"
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Descricao))
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <p class="mb-0">@Model.Descricao</p>
+                @if (!string.IsNullOrEmpty(Model.ArquivoUrl))
+                {
+                    <a href="@Model.ArquivoUrl" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                        <i class="bi bi-paperclip me-1"></i> @Model.NomeArquivo
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    @if (Model.Tipo == "Avaliativa")
+    {
+        @* Atividade avaliativa — mostra respostas *@
+        var respostas = ViewBag.Respostas as List<AVA_ASPNET.Models.RespostaAtividade> ?? new();
+
+        <h5 class="mb-3">
+            Respostas
+            <span class="badge bg-secondary ms-1">@respostas.Count</span>
+        </h5>
+
+        @if (!respostas.Any())
+        {
+            <div class="alert alert-info">Nenhuma resposta ainda.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Data</th>
+                            <th>Acertos</th>
+                            <th>Nota</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in respostas.OrderByDescending(r => r.Nota))
+                        {
+                            <tr>
+                                <td>@r.Aluno?.NomeCompleto</td>
+                                <td class="text-muted small">
+                                    @r.DataResposta.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td>@r.TotalAcertos / @r.TotalQuestoes</td>
+                                <td>
+                                    <span class="badge @(r.Nota >= Model.ValorMaximo * 0.6m ? "bg-success" : "bg-danger")">
+                                        @r.Nota / @Model.ValorMaximo
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    else
+    {
+        @* Atividade de entrega — mostra entregas *@
+        <h5 class="mb-3">
+            Entregas
+            <span class="badge bg-secondary ms-1">@Model.Entregas.Count</span>
+        </h5>
+
+        @if (!Model.Entregas.Any())
+        {
+            <div class="alert alert-info">Nenhuma entrega ainda.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Data entrega</th>
+                            <th>Nota</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var entrega in Model.Entregas.OrderBy(e => e.Aluno?.NomeCompleto))
+                        {
+                            <tr>
+                                <td>@entrega.Aluno?.NomeCompleto</td>
+                                <td class="text-muted small">
+                                    @entrega.DataEntrega.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td>
+                                    @if (entrega.Corrigida)
+                                    {
+                                        <strong>@entrega.Nota / @Model.ValorMaximo</strong>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (entrega.Corrigida)
+                                    {
+                                        <span class="badge bg-success">Corrigida</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Pendente</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="CorrigirEntrega"
+                                       asp-route-entregaId="@entrega.Id"
+                                       asp-route-turmaId="@ViewBag.TurmaId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil-square me-1"></i>
+                                        @(entrega.Corrigida ? "Ver/Editar" : "Corrigir")
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+</div>

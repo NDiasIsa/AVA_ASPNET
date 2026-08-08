@@ -1,0 +1,47 @@
+﻿@model AVA_ASPNET.Models.Noticia
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            @if (!string.IsNullOrEmpty(Model.ImagemUrl))
+            {
+                <img src="@Model.ImagemUrl" alt="@Model.Titulo"
+                     class="w-100 mb-4" style="border-radius:8px; max-height:400px; object-fit:cover;">
+            }
+
+            <h1 class="titulo mb-2">@Model.Titulo</h1>
+
+            <p class="text-muted small mb-4">
+                <i class="bi bi-calendar me-1"></i>
+                @Model.DataPublicacao.ToString("dd/MM/yyyy HH:mm")
+                @if (Model.Autor != null)
+                {
+                    <span class="ms-3">
+                        <i class="bi bi-person me-1"></i> @Model.Autor.NomeCompleto
+                    </span>
+                }
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model.Resumo))
+            {
+                <p class="lead mb-4">@Model.Resumo</p>
+            }
+
+            <hr>
+
+            <!-- Conteúdo HTML do Quill -->
+            <div class="mt-4">
+                @Html.Raw(Model.Conteudo)
+            </div>
+
+            <hr class="mt-5">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Voltar ao início
+            </a>
+        </div>
+    </div>
+</div>

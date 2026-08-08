@@ -32,6 +32,11 @@ namespace AVA_ASPNET.Models
         public virtual ICollection<ProfessorTurma> ProfessorTurmas { get; set; } = new List<ProfessorTurma>();
 
         public string NomeExibicao => $"{Ano}º EM — Turma {Codigo} ({AnoLetivo})";
+
+        public virtual ICollection<Secao> Secoes { get; set; } = new List<Secao>();
+        public virtual ICollection<Aviso> Avisos { get; set; } = new List<Aviso>();
+
+        public virtual ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
     }
 
     /// <summary>Tabela de junção Professor ↔ Turma (professor pode lecionar em várias turmas)</summary>
@@ -44,4 +49,6 @@ namespace AVA_ASPNET.Models
         public virtual Perfil? Perfil { get; set; }
         public virtual Turma? Turma { get; set; }
     }
+
+
 }

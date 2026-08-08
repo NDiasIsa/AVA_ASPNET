@@ -1,0 +1,59 @@
+﻿@model AVA_ASPNET.Models.IniciarAnoLetivoViewModel
+@{
+    ViewData["Title"] = "Iniciar Novo Ano Letivo";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <h2 class="titulo mb-4">Iniciar Novo Ano Letivo</h2>
+
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Atenção!</strong> Esta ação irá:
+                <ul class="mb-0 mt-2">
+                    <li>Encerrar o ano letivo <strong>@Model.AnoAtual</strong></li>
+                    <li>Desvincular <strong>@Model.TotalAlunosAtivos aluno(s)</strong> de suas turmas</li>
+                    <li>As <strong>@Model.TotalTurmas turma(s)</strong> continuam — só os alunos são desvinculados</li>
+                    <li>Cada professor reimporta o CSV da sua turma para reativar os alunos</li>
+                </ul>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <p class="text-muted small mb-1">Ano atual</p>
+                            <h4 class="titulo">@Model.AnoAtual</h4>
+                        </div>
+                        <div class="col-auto d-flex align-items-center">
+                            <i class="bi bi-arrow-right fs-3 text-muted"></i>
+                        </div>
+                        <div class="col">
+                            <p class="text-muted small mb-1">Novo ano</p>
+                            <h4 class="titulo">@Model.AnoNovo</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="IniciarAnoLetivo" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="AnoAtual" />
+                <input type="hidden" asp-for="AnoNovo" />
+                <input type="hidden" asp-for="TotalAlunosAtivos" />
+                <input type="hidden" asp-for="TotalTurmas" />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-warning flex-fill py-2">
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        Confirmar — Iniciar @Model.AnoNovo
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary flex-fill py-2">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
