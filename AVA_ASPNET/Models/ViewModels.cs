@@ -29,8 +29,9 @@ namespace AVA_ASPNET.Models
     // ─── Primeiro acesso do aluno (só define senha) ───────────────
     public class PrimeiroAcessoViewModel
     {
-        [Required]
-        public string Matricula { get; set; } = string.Empty;
+        public string TipoUsuario { get; set; } = string.Empty;
+
+        public string? Matricula { get; set; }
 
         public string NomeCompleto { get; set; } = string.Empty;
         public string NomeTurma { get; set; } = string.Empty;
@@ -45,9 +46,9 @@ namespace AVA_ASPNET.Models
         [Display(Name = "Confirmar senha")]
         public string ConfirmarSenha { get; set; } = string.Empty;
 
-        [Required, EmailAddress]
+        [EmailAddress]
         [Display(Name = "E-mail pessoal (para recuperação de senha)")]
-        public string EmailPessoal { get; set; } = string.Empty;
+        public string? EmailPessoal { get; set; }
     }
 
     // ─── Esqueci minha senha ──────────────────────────────────────

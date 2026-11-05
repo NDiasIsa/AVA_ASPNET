@@ -65,6 +65,9 @@ namespace AVA_ASPNET.Controllers
                 return View(model);
             }
 
+            if (perfil != null && perfil.PrimeiroAcesso)
+                return RedirectToAction(nameof(PrimeiroAcesso));
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -79,7 +82,6 @@ namespace AVA_ASPNET.Controllers
         }
 
         // ── Primeiro acesso ───────────────────────────────────────
-
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> PrimeiroAcesso()
@@ -96,7 +98,8 @@ namespace AVA_ASPNET.Controllers
 
             return View(new PrimeiroAcessoViewModel
             {
-                Matricula = perfil.Matricula ?? "",
+                TipoUsuario = perfil.TipoUsuario,
+                Matricula = perfil.Matricula,
                 NomeCompleto = perfil.NomeCompleto,
                 NomeTurma = perfil.Turma?.NomeExibicao ?? "—"
             });
@@ -116,9 +119,15 @@ namespace AVA_ASPNET.Controllers
 
             if (perfil == null) return RedirectToAction(nameof(Login));
 
+            model.TipoUsuario = perfil.TipoUsuario;
             model.NomeCompleto = perfil.NomeCompleto;
-            model.Matricula = perfil.Matricula ?? "";
+            model.Matricula = perfil.Matricula;
             model.NomeTurma = perfil.Turma?.NomeExibicao ?? "—";
+
+            if (perfil.TipoUsuario == "Aluno" && string.IsNullOrWhiteSpace(model.EmailPessoal))
+            {
+                ModelState.AddModelError(nameof(model.EmailPessoal), "Informe um e-mail pessoal para recuperação de senha.");
+            }
 
             if (!ModelState.IsValid) return View(model);
 

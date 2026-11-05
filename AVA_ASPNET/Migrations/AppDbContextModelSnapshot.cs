@@ -45,7 +45,33 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("QuestaoId");
 
-                    b.ToTable("Alternativas");
+                    b.ToTable("Alternativas", (string)null);
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.AlternativaAtividade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Correta")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("QuestaoAtividadeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestaoAtividadeId");
+
+                    b.ToTable("AlternativasAtividade", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.AnoLetivo", b =>
@@ -72,7 +98,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("Ativo");
 
-                    b.ToTable("AnosLetivos");
+                    b.ToTable("AnosLetivos", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Atividade", b =>
@@ -104,6 +130,10 @@ namespace AVA_ASPNET.Migrations
                     b.Property<int>("SecaoId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -118,7 +148,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("SecaoId");
 
-                    b.ToTable("Atividades");
+                    b.ToTable("Atividades", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Aviso", b =>
@@ -148,7 +178,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("TurmaId");
 
-                    b.ToTable("Avisos");
+                    b.ToTable("Avisos", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.EntregaAtividade", b =>
@@ -193,7 +223,7 @@ namespace AVA_ASPNET.Migrations
                     b.HasIndex("AtividadeId", "AlunoId")
                         .IsUnique();
 
-                    b.ToTable("EntregasAtividade");
+                    b.ToTable("EntregasAtividade", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Noticia", b =>
@@ -245,7 +275,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("AutorId");
 
-                    b.ToTable("Noticias");
+                    b.ToTable("Noticias", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Perfil", b =>
@@ -258,6 +288,9 @@ namespace AVA_ASPNET.Migrations
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
+
+                    b.Property<string>("EmailPessoal")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FotoUrl")
                         .HasColumnType("nvarchar(max)");
@@ -297,7 +330,7 @@ namespace AVA_ASPNET.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Perfis");
+                    b.ToTable("Perfis", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.ProfessorTurma", b =>
@@ -321,7 +354,7 @@ namespace AVA_ASPNET.Migrations
                     b.HasIndex("PerfilId", "TurmaId")
                         .IsUnique();
 
-                    b.ToTable("ProfessorTurmas");
+                    b.ToTable("ProfessorTurmas", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Publicacao", b =>
@@ -366,7 +399,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("SecaoId");
 
-                    b.ToTable("Publicacoes");
+                    b.ToTable("Publicacoes", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Questao", b =>
@@ -381,6 +414,12 @@ namespace AVA_ASPNET.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Explicacao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExplicacaoMidiaUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ImagemUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -390,11 +429,43 @@ namespace AVA_ASPNET.Migrations
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TipoExplicacao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuizId");
 
-                    b.ToTable("Questoes");
+                    b.ToTable("Questoes", (string)null);
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.QuestaoAtividade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AtividadeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Enunciado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagemUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Ordem")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AtividadeId");
+
+                    b.ToTable("QuestoesAtividade", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Quiz", b =>
@@ -431,7 +502,43 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("TurmaId");
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quizzes", (string)null);
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.RespostaAtividade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AtividadeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataResposta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Nota")
+                        .HasColumnType("decimal(4,1)");
+
+                    b.Property<int>("TotalAcertos")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalQuestoes")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlunoId");
+
+                    b.HasIndex("AtividadeId", "AlunoId")
+                        .IsUnique();
+
+                    b.ToTable("RespostasAtividade", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.ResultadoQuiz", b =>
@@ -466,7 +573,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("QuizId");
 
-                    b.ToTable("ResultadosQuiz");
+                    b.ToTable("ResultadosQuiz", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Secao", b =>
@@ -496,7 +603,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("TurmaId");
 
-                    b.ToTable("Secoes");
+                    b.ToTable("Secoes", (string)null);
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Turma", b =>
@@ -529,7 +636,7 @@ namespace AVA_ASPNET.Migrations
 
                     b.HasIndex("ProfessorId");
 
-                    b.ToTable("Turmas");
+                    b.ToTable("Turmas", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -741,6 +848,17 @@ namespace AVA_ASPNET.Migrations
                     b.Navigation("Questao");
                 });
 
+            modelBuilder.Entity("AVA_ASPNET.Models.AlternativaAtividade", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.QuestaoAtividade", "Questao")
+                        .WithMany("Alternativas")
+                        .HasForeignKey("QuestaoAtividadeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Questao");
+                });
+
             modelBuilder.Entity("AVA_ASPNET.Models.Atividade", b =>
                 {
                     b.HasOne("AVA_ASPNET.Models.Perfil", "Autor")
@@ -876,6 +994,17 @@ namespace AVA_ASPNET.Migrations
                     b.Navigation("Quiz");
                 });
 
+            modelBuilder.Entity("AVA_ASPNET.Models.QuestaoAtividade", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Atividade", "Atividade")
+                        .WithMany("Questoes")
+                        .HasForeignKey("AtividadeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Atividade");
+                });
+
             modelBuilder.Entity("AVA_ASPNET.Models.Quiz", b =>
                 {
                     b.HasOne("AVA_ASPNET.Models.Perfil", "Autor")
@@ -893,6 +1022,25 @@ namespace AVA_ASPNET.Migrations
                     b.Navigation("Autor");
 
                     b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.RespostaAtividade", b =>
+                {
+                    b.HasOne("AVA_ASPNET.Models.Perfil", "Aluno")
+                        .WithMany()
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AVA_ASPNET.Models.Atividade", "Atividade")
+                        .WithMany()
+                        .HasForeignKey("AtividadeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("Atividade");
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.ResultadoQuiz", b =>
@@ -990,6 +1138,8 @@ namespace AVA_ASPNET.Migrations
             modelBuilder.Entity("AVA_ASPNET.Models.Atividade", b =>
                 {
                     b.Navigation("Entregas");
+
+                    b.Navigation("Questoes");
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Perfil", b =>
@@ -998,6 +1148,11 @@ namespace AVA_ASPNET.Migrations
                 });
 
             modelBuilder.Entity("AVA_ASPNET.Models.Questao", b =>
+                {
+                    b.Navigation("Alternativas");
+                });
+
+            modelBuilder.Entity("AVA_ASPNET.Models.QuestaoAtividade", b =>
                 {
                     b.Navigation("Alternativas");
                 });

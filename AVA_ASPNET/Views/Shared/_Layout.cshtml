@@ -1,3 +1,21 @@
+@inject AVA_ASPNET.Data.AppDbContext Db
+@inject Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager
+@using Microsoft.EntityFrameworkCore
+@{
+    string? nomeExibido = User.Identity?.Name;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var usuarioAtual = await UserManager.GetUserAsync(User);
+        if (usuarioAtual != null)
+        {
+            var perfilAtual = await Db.Perfis.FirstOrDefaultAsync(p => p.UserId == usuarioAtual.Id);
+            if (perfilAtual != null && !string.IsNullOrEmpty(perfilAtual.NomeCompleto))
+            {
+                nomeExibido = perfilAtual.NomeCompleto;
+            }
+        }
+    }
+}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -23,7 +41,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-house"></i>
+                            <i class="bi bi-house me-1"></i>Início
                         </a>
                     </li>
                     @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -61,7 +79,7 @@
                         }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> @User.Identity.Name
+                                <i class="bi bi-person-circle"></i> @nomeExibido
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
@@ -105,7 +123,7 @@
 
     <main>@RenderBody()</main>
 
-    <footer class="row">
+    <footer class="row rodape">
         <p class="texto-rodape">&copy;IFRJ, Campus Pinheiral, @DateTime.Now.Year</p>
     </footer>
 

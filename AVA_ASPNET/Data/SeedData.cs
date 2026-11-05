@@ -1,5 +1,6 @@
 using AVA_ASPNET.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace AVA_ASPNET.Data
@@ -11,6 +12,7 @@ namespace AVA_ASPNET.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var config = serviceProvider.GetRequiredService<IConfiguration>();
+            var db = serviceProvider.GetRequiredService<AppDbContext>();
 
             // Criar roles
             string[] roles = { "Admin", "Professor", "Aluno" };
@@ -41,8 +43,16 @@ namespace AVA_ASPNET.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+            }
 
-                    var db = serviceProvider.GetRequiredService<AppDbContext>();
+            // Garante que o Perfil do admin existe, mesmo que o usuário Identity
+            // já existisse de uma execução anterior que tenha falhado antes de criar o Perfil
+            if (adminUser != null)
+            {
+                var adminPerfilExiste = await db.Perfis.AnyAsync(p => p.UserId == adminUser.Id);
+                if (!adminPerfilExiste)
+                {
                     db.Perfis.Add(new Perfil
                     {
                         UserId = adminUser.Id,
@@ -53,6 +63,18 @@ namespace AVA_ASPNET.Data
                     });
                     await db.SaveChangesAsync();
                 }
+            }
+            // Criar ano letivo inicial se não existir
+            var anoLetivoExiste = await db.AnosLetivos.AnyAsync();
+            if (!anoLetivoExiste)
+            {
+                db.AnosLetivos.Add(new AnoLetivo
+                {
+                    Ano = DateTime.Now.Year,
+                    Ativo = true,
+                    DataInicio = DateTime.Now
+                });
+                await db.SaveChangesAsync();
             }
         }
     }

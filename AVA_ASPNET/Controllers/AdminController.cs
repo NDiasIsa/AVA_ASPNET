@@ -127,7 +127,7 @@ namespace AVA_ASPNET.Controllers
                 UserId = user.Id,
                 TipoUsuario = "Professor",
                 NomeCompleto = model.NomeCompleto,
-                PrimeiroAcesso = false,
+                PrimeiroAcesso = true,
                 Ativo = true
             });
             await _db.SaveChangesAsync();
@@ -393,11 +393,30 @@ namespace AVA_ASPNET.Controllers
         // ── Ano letivo ────────────────────────────────────────────
 
         [HttpGet]
-        public IActionResult IniciarAnoLetivo() => View();
+        public async Task<IActionResult> IniciarAnoLetivo()
+        {
+            var anoAtual = await _db.AnosLetivos
+                .Where(a => a.Ativo)
+                .Select(a => a.Ano)
+                .FirstOrDefaultAsync();
+
+            var totalAlunos = await _db.Perfis
+                .CountAsync(p => p.TipoUsuario == "Aluno" && p.Ativo);
+
+            var totalTurmas = await _db.Turmas.CountAsync();
+
+            return View(new IniciarAnoLetivoViewModel
+            {
+                AnoAtual = anoAtual > 0 ? anoAtual : DateTime.Now.Year,
+                AnoNovo = (anoAtual > 0 ? anoAtual : DateTime.Now.Year) + 1,
+                TotalAlunosAtivos = totalAlunos,
+                TotalTurmas = totalTurmas
+            });
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> IniciarAnoLetivo(int ano)
+        public async Task<IActionResult> IniciarAnoLetivo(IniciarAnoLetivoViewModel model)
         {
             var alunos = await _db.Perfis.Where(p => p.TipoUsuario == "Aluno").ToListAsync();
             foreach (var aluno in alunos)
@@ -409,10 +428,10 @@ namespace AVA_ASPNET.Controllers
             var anoAtivo = await _db.AnosLetivos.FirstOrDefaultAsync(a => a.Ativo);
             if (anoAtivo != null) anoAtivo.Ativo = false;
 
-            _db.AnosLetivos.Add(new AnoLetivo { Ano = ano, Ativo = true });
+            _db.AnosLetivos.Add(new AnoLetivo { Ano = model.AnoNovo, Ativo = true });
             await _db.SaveChangesAsync();
 
-            TempData["Sucesso"] = $"Ano letivo {ano} iniciado!";
+            TempData["Sucesso"] = $"Ano letivo {model.AnoNovo} iniciado!";
             return RedirectToAction(nameof(Index));
         }
 

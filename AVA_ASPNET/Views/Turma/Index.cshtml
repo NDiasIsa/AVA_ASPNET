@@ -8,7 +8,7 @@
     @* Cabeçalho *@
     <div class="d-flex justify-content-between align-items-start mb-3">
         <div>
-            <h2 class="titulo mb-1">@Model.Turma.Codigo</h2>
+            <h2 class="numTurma titulo mb-1">@Model.Turma.Codigo</h2>
             <p class="text-muted mb-0">
                 @Model.Turma.Ano º EM — @Model.Turma.AnoLetivo
                 &nbsp;·&nbsp; Prof. @(Model.Turma.Professor?.NomeCompleto ?? "—")
@@ -74,7 +74,7 @@
                             <div class="d-flex gap-2">
                                 <input type="text" name="texto" class="form-control"
                                        placeholder="Escreva um aviso para a turma..." />
-                                <button type="submit" class="btn btn-primary text-nowrap">
+                                <button type="submit" class="btn-cor btn btn-cor text-nowrap">
                                     <i class="bi bi-send me-1"></i> Postar
                                 </button>
                             </div>
@@ -121,7 +121,7 @@
                 <h5 class="mb-0">Seções</h5>
                 @if (Model.EhProfessor)
                 {
-                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
+                    <button class="btn-cor btn btn-sm" data-bs-toggle="collapse"
                             data-bs-target="#formNovaSecao">
                         <i class="bi bi-plus-circle me-1"></i> Nova Seção
                     </button>
@@ -138,7 +138,7 @@
                             <div class="d-flex gap-2 mb-2">
                                 <input type="text" name="Nome" class="form-control"
                                        placeholder="Nome da nova seção" required />
-                                <button type="submit" class="btn btn-primary text-nowrap">Criar</button>
+                                <button type="submit" class="btn btn-cor text-nowrap">Criar</button>
                             </div>
                             <div class="d-flex gap-3">
                                 <div class="form-check">
@@ -242,10 +242,16 @@
                                                            class="btn btn-sm btn-outline-secondary">
                                                             <i class="bi bi-pencil"></i>
                                                         </a>
-                                                        <button type="button" class="btn btn-sm btn-outline-warning"
-                                                                data-bs-toggle="modal" data-bs-target="#copiarPub-@pub.Id">
-                                                            <i class="bi bi-copy"></i>
-                                                        </button>
+                                                        @if (Model.TurmasDoProfe.Any())
+                                                        {
+                                                            @if (Model.TurmasDoProfe.Any())
+                                                            {
+                                                                <button type="button" class="btn btn-sm btn-outline-warning"
+                                                                        data-bs-toggle="modal" data-bs-target="#copiarPub-@pub.Id">
+                                                                    <i class="bi bi-send"></i>
+                                                                </button>
+                                                            }
+                                                        }
                                                         <form asp-controller="Turma" asp-action="ExcluirPublicacao"
                                                               method="post" class="d-inline"
                                                               onsubmit="return confirm('Excluir este material?')">
@@ -272,7 +278,7 @@
                                         <div class="p-2 border-top">
                                             <a asp-controller="Turma" asp-action="CriarPublicacao"
                                                asp-route-secaoId="@secao.Id" asp-route-turmaId="@Model.Turma.Id"
-                                               class="btn btn-sm btn-outline-primary">
+                                               class="btn btn-sm btn-cor">
                                                 <i class="bi bi-plus-circle me-1"></i> Adicionar material
                                             </a>
                                         </div>
@@ -313,10 +319,13 @@
                                                            class="btn btn-sm btn-outline-secondary">
                                                             <i class="bi bi-eye"></i>
                                                         </a>
-                                                        <button type="button" class="btn btn-sm btn-outline-warning"
-                                                                data-bs-toggle="modal" data-bs-target="#copiarAtiv-@ativ.Id">
-                                                            <i class="bi bi-copy"></i>
-                                                        </button>
+                                                        @if (Model.TurmasDoProfe.Any())
+                                                        {
+                                                            <button type="button" class="btn btn-sm btn-outline-warning"
+                                                                    data-bs-toggle="modal" data-bs-target="#copiarAtiv-@ativ.Id">
+                                                                <i class="bi bi-send"></i>
+                                                            </button>
+                                                        }
                                                     }
                                                     else
                                                     {
@@ -330,11 +339,20 @@
                                                         }
                                                         else if (Model.AtividadesEntregues.Contains(ativ.Id))
                                                         {
-                                                            <a asp-controller="Turma" asp-action="EntregarAtividade"
-                                                               asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
-                                                               class="btn btn-sm btn-info text-white">
-                                                                <i class="bi bi-clock me-1"></i> Entregue
-                                                            </a>
+                                                            @if (ativ.Tipo == "Avaliativa")
+                                                            {
+                                                                <span class="btn btn-sm btn-info text-white disabled">
+                                                                    <i class="bi bi-clock me-1"></i> Entregue
+                                                                </span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                                   asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                                   class="btn btn-sm btn-info text-white">
+                                                                    <i class="bi bi-clock me-1"></i> Entregue
+                                                                </a>
+                                                            }
                                                         }
                                                         else if (ativ.Tipo == "Avaliativa")
                                                         {
@@ -414,7 +432,7 @@
                                                 </a>
                                                 <button type="button" class="btn btn-sm btn-outline-warning"
                                                         data-bs-toggle="modal" data-bs-target="#copiarAtiv-@ativ.Id">
-                                                    <i class="bi bi-copy"></i>
+                                                    <i class="bi bi-send"></i>
                                                 </button>
                                             }
                                             else
@@ -429,11 +447,20 @@
                                                 }
                                                 else if (Model.AtividadesEntregues.Contains(ativ.Id))
                                                 {
-                                                    <a asp-controller="Turma" asp-action="EntregarAtividade"
-                                                       asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
-                                                       class="btn btn-sm btn-info text-white">
-                                                        <i class="bi bi-clock me-1"></i> Entregue
-                                                    </a>
+                                                    @if (ativ.Tipo == "Avaliativa")
+                                                    {
+                                                        <span class="btn btn-sm btn-info text-white disabled">
+                                                            <i class="bi bi-clock me-1"></i> Entregue
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a asp-controller="Turma" asp-action="EntregarAtividade"
+                                                           asp-route-atividadeId="@ativ.Id" asp-route-turmaId="@Model.Turma.Id"
+                                                           class="btn btn-sm btn-info text-white">
+                                                            <i class="bi bi-clock me-1"></i> Entregue
+                                                        </a>
+                                                    }
                                                 }
                                                 else if (ativ.Tipo == "Avaliativa")
                                                 {
@@ -539,7 +566,7 @@
                             {
                                 <a asp-controller="Admin" asp-action="ImportarAlunos"
                                    asp-route-turmaId="@Model.Turma.Id"
-                                   class="btn btn-outline-primary btn-sm mt-2">
+                                   class="btn btn-cor btn-sm mt-2">
                                     <i class="bi bi-upload me-1"></i> Importar alunos
                                 </a>
                             }
@@ -595,10 +622,13 @@
                                        class="btn btn-sm btn-outline-secondary">
                                         <i class="bi bi-bar-chart me-1"></i> Resultados
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-warning"
-                                            data-bs-toggle="modal" data-bs-target="#copiarQuiz-@quiz.Id">
-                                        <i class="bi bi-copy"></i>
-                                    </button>
+                                    @if (Model.TurmasDoProfe.Any())
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-warning"
+                                                data-bs-toggle="modal" data-bs-target="#copiarQuiz-@quiz.Id">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+                                    }
                                     <form asp-controller="Quiz" asp-action="ExcluirQuiz"
                                           method="post" class="d-inline"
                                           onsubmit="return confirm('Excluir este quiz?')">

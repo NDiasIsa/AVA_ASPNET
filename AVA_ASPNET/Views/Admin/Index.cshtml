@@ -6,7 +6,7 @@
         <h2 class="titulo mb-0">Painel de Administração</h2>
         @if (ViewBag.AnoLetivo != null && ViewBag.AnoLetivo != 0)
         {
-            <span class="badge bg-primary fs-6">
+            <span class="badge ano-letivo-cor fs-6">
                 <i class="bi bi-calendar-check me-1"></i> Ano letivo: @ViewBag.AnoLetivo
             </span>
         }
@@ -30,7 +30,7 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body py-4">
-                    <i class="bi bi-person-slash" style="font-size:2rem;color:#aaa;"></i>
+                    <i class="bi bi-person-dash" style="font-size:2rem;color:#aaa;"></i>
                     <h3 class="mt-2 mb-0 text-muted">@ViewBag.TotalAlunosInativos</h3>
                     <p class="text-muted mb-0 small">Alunos inativos</p>
                 </div>
@@ -57,7 +57,7 @@
     </div>
     <div class="row g-3">
         <div class="col-md-4">
-            <a asp-action="Usuarios" class="btn btn-outline-primary w-100 py-3">
+            <a asp-action="Usuarios" class="btn btn-cor w-100 py-3">
                 <i class="bi bi-people me-2"></i> Gerenciar Usuários
             </a>
         </div>

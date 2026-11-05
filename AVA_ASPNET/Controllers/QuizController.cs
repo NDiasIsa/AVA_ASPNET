@@ -28,6 +28,24 @@ namespace AVA_ASPNET.Controllers
             return await _db.Perfis.FirstOrDefaultAsync(p => p.UserId == user.Id);
         }
 
+        // ── Exibir formulário de criação (professor) ───────────────
+
+        [HttpGet]
+        [Authorize(Roles = UsuarioRole.AdminEProfessor)]
+        public IActionResult CriarQuiz(int turmaId)
+        {
+            var model = new QuizViewModel
+            {
+                TurmaId = turmaId,
+                Questoes = new List<QuestaoViewModel>
+                {
+                    new QuestaoViewModel()
+                }
+            };
+
+            return View(model);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = UsuarioRole.AdminEProfessor)]
