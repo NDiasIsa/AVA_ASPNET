@@ -30,11 +30,27 @@ Sempre que o esquema do banco mudar, rode `npm run db:generate` e depois `npm ru
 cp .env.example .env.local
 ```
 
-Preencha o arquivo. Para dispensar a conta na Vercel durante o desenvolvimento, deixe `BLOB_READ_WRITE_TOKEN` vazio e defina `NEXT_PUBLIC_UPLOAD_LOCAL=1`: os arquivos vão para a pasta `.data/`.
+Preencha o arquivo. O site não abre sem `DATABASE_URL` e `AUTH_SECRET`. Para dispensar a conta na Vercel durante o desenvolvimento, deixe `BLOB_READ_WRITE_TOKEN` vazio e defina `NEXT_PUBLIC_UPLOAD_LOCAL=1`: os arquivos vão para a pasta `.data/`.
+
+Para dispensar também o Neon, use `DATABASE_URL=postgres://local:local@localhost:54329/quantum` e deixe este comando rodando em um terminal:
+
+```bash
+npm run db:local
+```
+
+Em outro terminal, crie as tabelas e o administrador. Só é preciso fazer isso uma vez:
 
 ```bash
 npm run db:setup
 ```
+
+Se quiser conteúdo de exemplo, crie os dados de demonstração. Eles só funcionam em banco local, e todos os usuários usam a `ADMIN_SENHA`: `professor@demo.local` e as matrículas `20260001` e `20260002`.
+
+```bash
+npm run db:demo
+```
+
+Depois, inicie o site:
 
 ```bash
 npm run dev

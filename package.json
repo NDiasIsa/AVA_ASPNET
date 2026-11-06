@@ -15,7 +15,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file-if-exists=.env.local scripts/migrar.ts",
     "db:seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
-    "db:setup": "npm run db:migrate && npm run db:seed"
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "db:local": "tsx scripts/db-local.ts",
+    "db:demo": "tsx --env-file-if-exists=.env.local scripts/demo.ts"
   },
   "dependencies": {
     "@vercel/blob": "^2.8.2",
@@ -40,6 +42,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/sanitize-html": "^2.16.2",
     "drizzle-kit": "^0.31.11",
+    "embedded-postgres": "^18.6.0-beta.19",
     "tsx": "^4.23.15",
     "typescript": "5.9",
     "vitest": "^5.1.0"
