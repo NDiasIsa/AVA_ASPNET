@@ -1,0 +1,47 @@
+{
+  "name": "quantum-pinheiral",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=.env.local scripts/migrar.ts",
+    "db:seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
+    "db:setup": "npm run db:migrate && npm run db:seed"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.8.2",
+    "csv-parse": "^7.0.3",
+    "drizzle-orm": "^0.45.4",
+    "jose": "^6.2.15",
+    "katex": "^0.19.1",
+    "lucide-react": "^1.69.0",
+    "next": "^16.4.5",
+    "pg": "^8.23.1",
+    "quill": "^2.0.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sanitize-html": "^2.18.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.8",
+    "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/sanitize-html": "^2.16.2",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.23.15",
+    "typescript": "5.9",
+    "vitest": "^5.1.0"
+  }
+}
