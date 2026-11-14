@@ -81,7 +81,13 @@ Preços como `R$ 10` continuam sendo texto. Os campos mostram uma pré-visualiza
 
 ## Recuperação de senha
 
-O fluxo está pronto, mas ainda não há serviço de e-mail. Para ativar, implemente o envio em [src/lib/email.ts](src/lib/email.ts). Até lá, nenhuma mensagem é entregue em produção.
+Os e-mails saem por uma conta Google, via SMTP do Gmail ([src/lib/email.ts](src/lib/email.ts)):
+
+1. Na conta Google que vai enviar, ative a **verificação em duas etapas**.
+2. Em [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords), crie uma senha de app (ex.: "QuantumPinheiral").
+3. Cadastre `GMAIL_USER` (o endereço da conta) e `GMAIL_APP_PASSWORD` (a senha de 16 letras) no `.env.local` e na Vercel.
+
+Sem essas variáveis, nada é enviado: em desenvolvimento a mensagem aparece no terminal. O Gmail limita o envio a cerca de 500 mensagens por dia numa conta gratuita.
 
 ## Organização
 

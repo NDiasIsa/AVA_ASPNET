@@ -301,6 +301,53 @@ img {
   min-height: 1.5em;
 }
 
+.aviso-rolagem {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: 1.25rem;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.8rem 0.55rem 1.1rem;
+  color: var(--foton);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  background: rgba(10, 17, 48, 0.82);
+  border: 1px solid rgba(255, 182, 72, 0.45);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: opacity 0.3s ease;
+}
+
+.aviso-rolagem:hover {
+  color: var(--luz);
+  border-color: var(--foton);
+}
+
+.aviso-rolagem svg {
+  animation: quicar 1.8s ease-in-out infinite;
+}
+
+.aviso-rolagem[data-oculto] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes quicar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
 /* ── Notícias ──────────────────────────────────────────────── */
 
 .secao-home {

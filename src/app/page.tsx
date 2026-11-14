@@ -1,5 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import Link from "next/link";
+import { AvisoRolagem } from "@/components/aviso-rolagem";
 import { Destaques } from "@/components/destaques";
 import { FuncaoOnda } from "@/components/funcao-onda";
 import { Tex } from "@/components/tex";
@@ -14,6 +15,7 @@ export default async function Inicio() {
   ]);
   const destaques = noticias.filter((n) => n.destaque);
   const cards = noticias.filter((n) => n.card);
+  const totalNoticias = noticias.filter((n) => n.destaque || n.card).length;
 
   const destino = !usuario
     ? { href: "/login", rotulo: "Entrar" }
@@ -34,10 +36,16 @@ export default async function Inicio() {
           </Link>
         </div>
         <FuncaoOnda />
+        {totalNoticias > 0 && (
+          <AvisoRolagem
+            alvo={destaques.length > 0 ? "destaques" : "noticias"}
+            rotulo={totalNoticias === 1 ? "1 notícia abaixo" : `${totalNoticias} notícias abaixo`}
+          />
+        )}
       </section>
 
       {destaques.length > 0 && (
-        <section className="secao-home" aria-labelledby="titulo-destaques">
+        <section id="destaques" className="secao-home" aria-labelledby="titulo-destaques">
           <h2 id="titulo-destaques">Destaques</h2>
           <Destaques
             itens={destaques.map((n) => ({
@@ -51,7 +59,7 @@ export default async function Inicio() {
       )}
 
       {cards.length > 0 && (
-        <section className="secao-home" aria-labelledby="titulo-noticias" style={{ paddingBottom: "4rem" }}>
+        <section id="noticias" className="secao-home" aria-labelledby="titulo-noticias" style={{ paddingBottom: "4rem" }}>
           <h2 id="titulo-noticias">Notícias</h2>
           <div className="noticias-lista">
             {cards.map((n) => (

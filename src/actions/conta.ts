@@ -1,20 +1,17 @@
 "use server";
 
-import { createHash, randomBytes } from "node:crypto";
 import { and, eq, gt, sql } from "drizzle-orm";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db, t } from "@/lib/db";
 import { enviarEmail } from "@/lib/email";
 import { flash } from "@/lib/flash";
 import { conferirSenha, gerarHash, validarPoliticaSenha } from "@/lib/senha";
 import { encerrarSessao, iniciarSessao, obterUsuario } from "@/lib/sessao";
+import { criarLinkSenha, hashToken, VALIDADE_RECUPERACAO_MS } from "@/lib/token-senha";
 import { emailValido, type EstadoForm, marcado, texto } from "./util";
 
 const CREDENCIAIS_INVALIDAS = "Matrícula, e-mail ou senha incorretos.";
 const AVISO_RECUPERACAO = "Se encontrarmos sua conta, enviaremos um e-mail com instruções.";
-
-const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 
 export async function entrar(_: EstadoForm, fd: FormData): Promise<EstadoForm> {
   const login = texto(fd, "identificador").toLowerCase();
@@ -67,17 +64,7 @@ export async function solicitarRecuperacao(_: EstadoForm, fd: FormData): Promise
   const destino = usuario?.emailPessoal ?? usuario?.email;
 
   if (usuario && destino) {
-    const token = randomBytes(32).toString("base64url");
-    await db.delete(t.tokensSenha).where(eq(t.tokensSenha.usuarioId, usuario.id));
-    await db.insert(t.tokensSenha).values({
-      tokenHash: hashToken(token),
-      usuarioId: usuario.id,
-      expiraEm: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    });
-
-    const h = await headers();
-    const origem = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
-    const link = `${origem}/redefinir-senha?token=${token}`;
+    const link = await criarLinkSenha(usuario.id, VALIDADE_RECUPERACAO_MS);
     await enviarEmail(
       destino,
       "Redefinição de senha: QuantumPinheiral",
@@ -116,6 +103,6 @@ export async function redefinirSenha(_: EstadoForm, fd: FormData): Promise<Estad
     .where(eq(t.usuarios.id, registro.usuarioId));
   await db.delete(t.tokensSenha).where(eq(t.tokensSenha.usuarioId, registro.usuarioId));
 
-  await flash("sucesso", "Senha redefinida. Entre com a nova senha.");
+  await flash("sucesso", "Senha salva. Entre com ela agora.");
   redirect("/login");
 }

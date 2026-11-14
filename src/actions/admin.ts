@@ -8,8 +8,10 @@ import sanitizeHtml from "sanitize-html";
 import { db, ehErroEmUso, t } from "@/lib/db";
 import { ErroArquivo, receberArquivo, removerArquivo } from "@/lib/arquivos/armazenamento";
 import { flash } from "@/lib/flash";
-import { gerarHash, SENHA_INICIAL_ALUNO, validarPoliticaSenha } from "@/lib/senha";
+import { enviarEmail } from "@/lib/email";
+import { gerarHash, SENHA_INICIAL_ALUNO } from "@/lib/senha";
 import { exigirGestao, exigirUsuario } from "@/lib/sessao";
+import { criarLinkSenha, senhaInutilizavel, VALIDADE_CONVITE_MS } from "@/lib/token-senha";
 import { emailValido, type EstadoForm, inteiro, marcado, texto, textoOuNulo } from "./util";
 
 async function perfilAdmin() {
@@ -53,38 +55,67 @@ export async function excluirUsuario(fd: FormData) {
   redirect("/admin/usuarios");
 }
 
+const escaparHtml = (texto: string) =>
+  texto.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+/** Envia ao professor o link para criar a senha. Devolve false se o e-mail não saiu. */
+async function enviarConvite(professor: { id: number; nomeCompleto: string; email: string }) {
+  const link = await criarLinkSenha(professor.id, VALIDADE_CONVITE_MS);
+  return enviarEmail(
+    professor.email,
+    "Seu acesso ao QuantumPinheiral",
+    `<p>Olá, ${escaparHtml(professor.nomeCompleto)}!</p>
+     <p>Você foi cadastrado(a) como professor(a) no QuantumPinheiral. Para entrar, crie sua senha:</p>
+     <p><a href="${link}">Criar minha senha</a></p>
+     <p>Depois, entre com o e-mail <strong>${escaparHtml(professor.email)}</strong> e a senha que você criou.</p>
+     <p>O link expira em 15 dias. Se ele expirar, use "Esqueci minha senha" na tela de entrada.</p>`,
+  );
+}
+
 export async function criarProfessor(_: EstadoForm, fd: FormData): Promise<EstadoForm> {
   await exigirUsuario("Admin");
 
   const nomeCompleto = texto(fd, "nomeCompleto");
   const email = texto(fd, "email").toLowerCase();
-  const matricula = textoOuNulo(fd, "matricula");
-  const senha = String(fd.get("senha") ?? "");
 
   if (!nomeCompleto || nomeCompleto.length > 150) return { erro: "Informe o nome completo, com até 150 caracteres." };
-  if (!emailValido(email)) return { erro: "Informe um e-mail válido." };
-  if (matricula && matricula.length > 20) return { erro: "A matrícula funcional pode ter até 20 caracteres." };
-  if (senha !== fd.get("confirmarSenha")) return { erro: "As senhas não coincidem." };
-  const erroSenha = validarPoliticaSenha(senha);
-  if (erroSenha) return { erro: erroSenha };
+  if (!emailValido(email) || email.length > 256) return { erro: "Informe um e-mail válido." };
 
   const existente = await db.query.usuarios.findFirst({ where: eq(t.usuarios.login, email) });
   if (existente) return { erro: "Este e-mail já está cadastrado." };
-  if (matricula) {
-    const mesmaMatricula = await db.query.usuarios.findFirst({ where: eq(t.usuarios.matricula, matricula) });
-    if (mesmaMatricula) return { erro: "Esta matrícula já está cadastrada." };
-  }
 
-  await db.insert(t.usuarios).values({
-    login: email,
-    email,
-    matricula,
-    senhaHash: await gerarHash(senha),
-    tipo: "Professor",
-    nomeCompleto,
+  const [professor] = await db
+    .insert(t.usuarios)
+    .values({
+      login: email,
+      email,
+      senhaHash: await gerarHash(senhaInutilizavel()),
+      tipo: "Professor",
+      nomeCompleto,
+    })
+    .returning();
+
+  if (await enviarConvite({ ...professor, email })) {
+    await flash("sucesso", `Convite enviado para ${email}. O link vale por 15 dias.`);
+  } else {
+    await flash("erro", `${nomeCompleto} foi cadastrado(a), mas o e-mail não foi enviado. Use "Reenviar convite".`);
+  }
+  redirect("/admin/usuarios");
+}
+
+export async function reenviarConvite(fd: FormData) {
+  await exigirUsuario("Admin");
+  const professor = await db.query.usuarios.findFirst({
+    where: and(eq(t.usuarios.id, inteiro(fd, "id")), eq(t.usuarios.tipo, "Professor")),
   });
 
-  await flash("sucesso", `Professor(a) ${nomeCompleto} cadastrado(a).`);
+  if (!professor?.email || !professor.primeiroAcesso) {
+    await flash("erro", "Este professor já criou a senha.");
+  } else if (await enviarConvite({ ...professor, email: professor.email })) {
+    await flash("sucesso", `Novo convite enviado para ${professor.email}. O link anterior deixou de valer.`);
+  } else {
+    await flash("erro", "O e-mail não foi enviado. Confira a configuração do Gmail.");
+  }
   redirect("/admin/usuarios");
 }
 

@@ -2,7 +2,7 @@ import { asc } from "drizzle-orm";
 import { UserPlus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { excluirUsuario } from "@/actions/admin";
+import { excluirUsuario, reenviarConvite } from "@/actions/admin";
 import { Cabecalho } from "@/components/cabecalho";
 import { BotaoConfirmar } from "@/components/confirmar";
 import { Ket } from "@/components/ket";
@@ -52,7 +52,9 @@ export default async function Usuarios() {
                 <td>{u.tipo}</td>
                 <td className="linha-meta">{u.turma ? nomeTurma(u.turma) : "Sem turma"}</td>
                 <td>
-                  {u.tipo === "Aluno" && u.primeiroAcesso ? (
+                  {u.tipo === "Professor" && u.primeiroAcesso ? (
+                    <Ket estado="pendente">convite pendente</Ket>
+                  ) : u.tipo === "Aluno" && u.primeiroAcesso ? (
                     <Ket estado="pendente">1º acesso</Ket>
                   ) : u.ativo ? (
                     <Ket estado="corrigida">ativo</Ket>
@@ -61,12 +63,22 @@ export default async function Usuarios() {
                   )}
                 </td>
                 <td>
-                  {u.tipo !== "Admin" && (
-                    <form action={excluirUsuario}>
-                      <input type="hidden" name="id" value={u.id} />
-                      <BotaoConfirmar mensagem={`Excluir ${u.nomeCompleto}?`} rotulo={`Excluir ${u.nomeCompleto}`} />
-                    </form>
-                  )}
+                  <div className="acoes" style={{ justifyContent: "flex-end", flexWrap: "nowrap" }}>
+                    {u.tipo === "Professor" && u.primeiroAcesso && (
+                      <form action={reenviarConvite}>
+                        <input type="hidden" name="id" value={u.id} />
+                        <button type="submit" className="botao botao-secundario botao-pequeno">
+                          Reenviar convite
+                        </button>
+                      </form>
+                    )}
+                    {u.tipo !== "Admin" && (
+                      <form action={excluirUsuario}>
+                        <input type="hidden" name="id" value={u.id} />
+                        <BotaoConfirmar mensagem={`Excluir ${u.nomeCompleto}?`} rotulo={`Excluir ${u.nomeCompleto}`} />
+                      </form>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
